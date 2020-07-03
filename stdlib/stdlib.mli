@@ -1378,6 +1378,7 @@ module Printf       = Printf
 module Queue        = Queue
 module Random       = Random
 module Result       = Result
+module Rope         = Rope
 module Scanf        = Scanf
 module Seq          = Seq
 module Set          = Set
