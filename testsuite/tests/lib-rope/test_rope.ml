@@ -1,5 +1,6 @@
 (* TEST
 *)
+open Rope;;
 
 let rec build_rope f n accu =
   if n <= 0
@@ -20,6 +21,37 @@ let reference n =
   else char n
 ;;
 
+(* build 
+       /                                       \
+    /                          \ 
+  /    \                /             \
+Hello_  my_         /      \        /     \
+                   na      me_i    s      _Simon
+
+"Hello_/my_na_me_is_Simon" *)
+
+let build_rope2 () = 
+  let r1 = of_string "Hello_"
+  and r2 = of_string "my_"
+  in let r3 = r1 ^ r2 
+  in
+  let r4 =  of_string "na"
+  and r5 =  of_string "me_i"
+  in let r6 = r4 ^ r5
+  in
+  let r7 = of_string "s" 
+  and r8 = of_string "_Simon"
+  in 
+  let r9 =  r7 ^ r8
+  in
+  let r10 = r6 ^ r9
+  in
+  let r11 = r3 ^ r10
+  in
+  r11 ^ empty
+;;
+
+
 let raw_string = build_rope char 256 [];;
 let ref_string = build_rope reference 256 [];;
 
@@ -36,12 +68,54 @@ let check_split sep s =
   List.iter (Rope.iter (fun c -> assert (c <> sep))) l
 ;;  
 
+
 let () =
   let s =" abc def " in
   for i = 0 to String.length s do
     check_split ' ' (String.sub s 0 i)
   done
 ;;
+
+(* test sub *)
+
+let () = 
+  let sub_string r s l = to_string (sub r s l) 
+  and r = build_rope2 () in
+  assert (sub_string r 2 4 = "llo_");
+  assert (sub_string r 2 5 = "llo_m");
+  assert (sub_string r 8 5 = "_name");
+  assert (sub_string r 15 3 = "s_S")
+
+
+(* test concat *)
+let () = 
+  let sep = of_string "a"
+  and rl = [of_string "b"; of_string "c"]
+  in
+  assert (to_string (concat sep rl) = "bac") 
+
+(* test mapi *)
+
+let () = 
+  let f i c = Char.chr (Char.code c + i)
+  in
+  let r = 
+    of_string "abc" ^ of_string "def"
+  in 
+  assert (to_string (mapi f r) = "acegik")
+
+(* test trim *)
+
+let () = 
+  let r = 
+      of_string " a   b " ^ of_string " d e "
+  in assert (to_string (trim r) = "a   b  d e")
+
+(* test rindex *)
+let () = 
+  let r = build_rope2 () in 
+  assert(rindex_from_opt r 6 'S' = None);
+  assert(rindex_from_opt r 21 'S' = Some 17)
 
 (* GPR#805/815/833 *)
 

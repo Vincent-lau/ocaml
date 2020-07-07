@@ -24,17 +24,34 @@ let bos = B.unsafe_of_string
 
 let empty = Leaf ""
 
-let of_string s = Leaf s
-
-let rec to_string = function
-  | Leaf s -> s
-  | Branch b -> (to_string b.left) ^ (to_string b.right)
-
-
 let rec length = function
   | Leaf s -> String.length s
   | Branch b -> b.leftlen + length b.right
 
+let of_string s = Leaf s
+
+
+let to_string r = 
+  let b = Bytes.create (length r) in
+  let rec to_string_rec r b ofs = match r with
+    | Leaf str -> Bytes.blit_string str 0 b ofs (String.length str)
+    | Branch {leftlen; left; right} -> 
+      to_string_rec left b ofs;
+      to_string_rec right b (ofs + leftlen)
+  in 
+  to_string_rec r b 0; b |> bts
+
+
+let rope_concat r1 r2 = 
+  if r1 = empty then r2 
+  else if r2 = empty then r1
+  else Branch {leftlen = (length r1); left = r1; right = r2}
+
+let (^) = rope_concat
+
+
+
+let is_empty r = (length r = 0)
 
 let make n c =
   B.make n c |> bts |> of_string
@@ -49,27 +66,27 @@ let copy r =
 
 (* exception later *)
 let rec sub r ofs len = match r with
-  | Leaf str -> Leaf (String.sub str ofs (min len (String.length str)))
+  | Leaf str -> 
+    let actual_len = min len (String.length str - ofs) in 
+    Leaf (String.sub str ofs actual_len)
   | Branch {leftlen; left; right} ->
     let left_sub = 
       if ofs = 0 && ofs + len = leftlen then
         left
       else if ofs >= leftlen then
-        Leaf ""
+        empty
       else
         sub left ofs len
     in let left_sub_len = length left_sub
     in let right_sub = 
       if ofs + len < leftlen then
-        Leaf ""
+        empty
       else
         sub right (max (ofs - leftlen) 0) (len - left_sub_len)
-    in Branch 
-    {
-      leftlen = left_sub_len; 
-      left = left_sub; 
-      right = right_sub
-    }
+    in left_sub ^ right_sub
+
+let get r i = 
+  String.get (to_string (sub r i 1)) 0
 
 (* deprecated *)
 let fill = 
@@ -98,43 +115,45 @@ let blit r =
     unsafe_blits dst (pos + length hd + seplen) sep seplen tl *)
 
 let rec concat sep = function
-    [] -> Leaf ""
-  | hd :: [] -> Branch {leftlen = (length hd); left = hd; right = (Leaf "")}
-  | hd :: tl -> 
-    let r = Branch {leftlen = (length hd); left = hd; right = sep} 
-  in Branch {leftlen = (length r); left = r; right = (concat sep tl)}
-
-
-
+    [] -> empty
+  | hd :: [] -> hd
+  | hd :: tl -> (hd ^ sep) ^ (concat sep tl)
+  
 let rec iter f = function
   | Leaf s -> String.iter f s
   | Branch b -> 
     iter f b.left;
     iter f b.right
 
-
-let rec iteri f = function
-  | Leaf s -> String.iteri f s
+let rec iteri_rec f ofs r = 
+  let f_ofs o i c = f (i + o) c in
+  match r with
+  | Leaf s -> String.iteri (f_ofs ofs) s
   | Branch b -> 
-    iteri f b.left;
-    iteri f b.right
+    iteri_rec f ofs b.left;
+    iteri_rec f (ofs + b.leftlen) b.right
 
+    
+let iteri f r = iteri_rec f 0 r
 
 let rec map f = function
-    | Leaf str -> Leaf (String.map f str)
-    | Branch b ->
-      let left = map f b.left and
-      right = map f b.right in
-      Branch {leftlen = b.leftlen; left; right}
+     | Leaf str -> Leaf (String.map f str)
+     | Branch b ->
+      let left = map f b.left and right = map f b.right 
+      in left ^ right
+
+
+let rec mapi_rec f ofs r = 
+  let f_ofs o i c = f (i + o) c in
+  match r with
+  | Leaf str -> Leaf (String.mapi (f_ofs ofs) str)
+  | Branch b ->
+  let left = mapi_rec f ofs b.left 
+  and right = mapi_rec f (ofs + b.leftlen) b.right in
+  Branch {leftlen = b.leftlen; left; right}
   
 
-let rec mapi f = function
-  | Leaf str -> Leaf (String.mapi f str)
-  | Branch b ->
-    let left = mapi f b.left and 
-      right = mapi f b.right in
-      Branch {leftlen = b.leftlen; left; right}
-
+let mapi f r = mapi_rec f 0 r
 
 let is_space = function
   | ' ' | '\012' | '\n' | '\r' | '\t' -> true
@@ -146,11 +165,11 @@ let rec trim_left = function
     while !i < len && is_space (String.unsafe_get str !i) do incr i done;
     if !i = len then empty else Leaf (String.sub str !i (len - !i))
   | Branch b ->
-    let l_res = trim_left b.left in
-    if (to_string l_res) = "" then
-      Branch {leftlen = 0; left = empty; right = (trim_left b.right)}
+    let l_trimmed = trim_left b.left in
+    if is_empty l_trimmed then
+      trim_left b.right
     else
-      Branch {leftlen = (length l_res); left = l_res; right = b.right}
+      l_trimmed ^ b.right
       
 let rec trim_right = function
     | Leaf str ->
@@ -158,25 +177,24 @@ let rec trim_right = function
       let i = ref (len - 1) in
       while !i >= 0 && is_space (String.unsafe_get str !i) do decr i done;
       if !i < 0 then empty else Leaf (String.sub str 0 (!i + 1))
-    | Branch {leftlen; left; right} ->
-      let r_res = trim_right right in
-      if (length r_res) = 0 then 
-        let l_res = trim_right left in
-        Branch {leftlen = (length l_res); left = l_res; right = empty}
+    | Branch b ->
+      let r_trimmed = trim_right b.right in
+      if is_empty r_trimmed then 
+        trim_right b.left
       else
-        Branch {leftlen; left; right = empty}
-
+        b.left ^ r_trimmed
+      
 let trim r = trim_left (trim_right r)
 
 let rec escaped = function
   | Leaf str -> Leaf (String.escaped str)
   | Branch b ->
     let left = escaped b.left and 
-    right = escaped b.right in
-    Branch {leftlen = (length left); left; right}
+    right = escaped b.right in 
+    left ^ right
   
 
-(* ofs is the length of the string we have already discarded
+(* ofs is the length of the string we have already discarded,
 i is the from-index *)
 let rec index_from_rec r ofs i c = match r with 
 | Leaf str -> (String.index_from str i c) + ofs
@@ -251,7 +269,8 @@ let contains_from r i c =
   if i < 0 || i > length r  then
     invalid_arg "Rope.contains_from"
   else
-    try ignore (index_from r i c); true with Not_found -> false
+    try ignore (index_from r i c); true 
+    with Not_found -> false
 
 let contains r c = contains_from r 0 c
 
@@ -270,17 +289,17 @@ let rec capitalize_ascii = function
   | Leaf str -> Leaf (String.capitalize_ascii str)
   | Branch {leftlen; left; right} ->
     if leftlen <> 0 then
-      Branch {leftlen; left = (capitalize_ascii left); right}
+      (capitalize_ascii left) ^ right
     else
-    Branch {leftlen; left = empty; right = (capitalize_ascii right)}
+      capitalize_ascii right
 
 let rec uncapitalize_ascii = function
   | Leaf str -> Leaf (String.uncapitalize_ascii str)
   | Branch {leftlen; left; right} ->
     if leftlen <> 0 then
-      Branch {leftlen; left = (uncapitalize_ascii left); right}
+      (uncapitalize_ascii left) ^ right
     else
-    Branch {leftlen; left = empty; right = (uncapitalize_ascii right)}
+      uncapitalize_ascii right
     
 
 exception Out_of_bounds of string;;
@@ -373,7 +392,8 @@ module Iterator = struct
 
 end
 
-
+(* this compare function also comes from 
+https://github.com/Chris00/ocaml-rope/tree/master/src *)
 exception Less 
 exception Greater
 let compare (x: t) (y: t) = 

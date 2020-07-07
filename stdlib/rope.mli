@@ -77,6 +77,9 @@ val to_string: t -> string
 
 val of_string: string -> t
 
+val get: rope -> int -> char
+
+val (^): rope -> rope ->rope
 
 val make : int -> char -> t
 (** [t.make n c] returns a fresh rope of length [n],
