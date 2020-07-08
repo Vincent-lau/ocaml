@@ -30,7 +30,6 @@ let rec length = function
 
 let of_string s = Leaf s
 
-
 let to_string r = 
   let b = Bytes.create (length r) in
   let rec to_string_rec r b ofs = match r with
@@ -49,8 +48,6 @@ let rope_concat r1 r2 =
 
 let (^) = rope_concat
 
-
-
 let is_empty r = (length r = 0)
 
 let make n c =
@@ -59,31 +56,39 @@ let make n c =
 let init n f =
   B.init n f |> bts |> of_string
 
+  
 let copy r =
   let s = to_string r in
-  B.copy (bos s) |> bts |> of_string (* deprecated, ignored for the moment *)
+  B.copy (bos s) |> bts |> of_string 
+(* deprecated, so just pure conversion *)
 
 
-(* exception later *)
-let rec sub r ofs len = match r with
-  | Leaf str -> 
-    let actual_len = min len (String.length str - ofs) in 
-    Leaf (String.sub str ofs actual_len)
-  | Branch {leftlen; left; right} ->
-    let left_sub = 
-      if ofs = 0 && ofs + len = leftlen then
-        left
-      else if ofs >= leftlen then
-        empty
-      else
-        sub left ofs len
-    in let left_sub_len = length left_sub
-    in let right_sub = 
-      if ofs + len < leftlen then
-        empty
-      else
-        sub right (max (ofs - leftlen) 0) (len - left_sub_len)
-    in left_sub ^ right_sub
+let sub r ofs len = 
+  if ofs < 0 || len < 0 || ofs + len > (length r) then 
+    invalid_arg "Rope.sub"
+  else if len = 0 then
+    empty
+  else
+    let rec sub_rec r ofs len = match r with
+        | Leaf str -> 
+          let actual_len = min len (String.length str - ofs) in 
+          Leaf (String.sub str ofs actual_len)
+        | Branch {leftlen; left; right} ->
+          let left_sub = 
+            if ofs = 0 && ofs + len = leftlen then
+              left
+            else if ofs >= leftlen then
+              empty
+            else
+              sub_rec left ofs len
+          in let left_sub_len = length left_sub
+          in let right_sub = 
+            if ofs + len < leftlen then
+              empty
+            else
+              sub_rec right (max (ofs - leftlen) 0) (len - left_sub_len)
+          in left_sub ^ right_sub
+    in sub_rec r ofs len
 
 let get r i = 
   String.get (to_string (sub r i 1)) 0
@@ -91,13 +96,11 @@ let get r i =
 (* deprecated *)
 let fill = 
   B.fill
-
+  
 (* pure conversion might not be efficient *)  
 let blit r = 
   to_string r |> B.blit_string
 
-
-(* let ensure_ge (x:int) y = if x >= y then x else invalid_arg "String.concat" *)
 
 (* let rec sum_lengths acc seplen = function
   | [] -> acc
@@ -114,6 +117,7 @@ let blit r =
     unsafe_blit sep 0 dst (pos + length hd) seplen;
     unsafe_blits dst (pos + length hd + seplen) sep seplen tl *)
 
+    
 let rec concat sep = function
     [] -> empty
   | hd :: [] -> hd

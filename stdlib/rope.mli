@@ -1,37 +1,3 @@
-(** t operations.
-
-  A t is an immutable data structure that contains a
-  fixed-length sequence of (single-byte) characters. Each character
-  can be accessed in constant time through its index.
-
-  Given a t [s] of length [l], we can access each of the [l]
-  characters of [s] via its index in the sequence. Indexes start at
-  [0], and we will call an index valid in [s] if it falls within the
-  range [[0...l-1]] (inclusive). A position is the point between two
-  characters or at the beginning or end of the t.  We call a
-  position valid in [s] if it falls within the range [[0...l]]
-  (inclusive). Note that the character at index [n] is between
-  positions [n] and [n+1].
-
-  Two parameters [start] and [len] are said to designate a valid
-  subt of [s] if [len >= 0] and [start] and [start+len] are
-  valid positions in [s].
-
-  Note: OCaml ts used to be modifiable in place, for instance via
-  the {!t.set} and {!t.blit} functions described below. This
-  usage is only possible when the compiler is put in "unsafe-t"
-  mode by giving the [-unsafe-t] command-line option. This
-  compatibility mode makes the types [t] and [bytes] (see module
-  {!Bytes}) interchangeable so that functions expecting byte sequences
-  can also accept ts as arguments and modify them.
-
-  The distinction between [bytes] and [t] was introduced in OCaml
-  4.02, and the "unsafe-t" compatibility mode was the default
-  until OCaml 4.05. Starting with 4.06, the compatibility mode is
-  opt-in; we intend to remove the option in the future.
-*)
-
-
 (* external length : string -> int = "%t_length"
 (** Return the length (number of characters) of the given t. *)
 
@@ -109,7 +75,7 @@ val sub : t -> int -> int -> t
    has length [len].
 
    Raise [Invalid_argument] if [start] and [len] do not
-   designate a valid subt of [s]. *)
+   designate a valid substring of [s]. *)
 
 val fill : bytes -> int -> int -> char -> unit
   [@@ocaml.deprecated "Use Bytes.fill instead."]
@@ -129,7 +95,8 @@ val concat : t -> t list -> t
     inserting the separator t [sep] between each.
 
     Raise [Invalid_argument] if the result is longer than
-    {!Sys.max_t_length} bytes. *)
+    {!Sys.max_t_length} bytes. However, ropes should not 
+   have a physical limit as it uses pointer *)
 
 val iter : (char -> unit) -> t -> unit
 (** [t.iter f s] applies function [f] in turn to all

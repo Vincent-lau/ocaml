@@ -4,20 +4,20 @@ open Rope;;
 
 let rec build_rope f n accu =
   if n <= 0
-    then Rope.concat (Rope.of_string "") accu
+    then concat (of_string "") accu
     else build_rope f (n-1) (f (n-1) :: accu)
 ;;
 
-let char n = Rope.make 1 (Char.chr n);;
+let char n = make 1 (Char.chr n);;
 
 let reference n =
-  if n = 8 then Rope.of_string "\\b"
-  else if n = 9 then Rope.of_string "\\t"
-  else if n = 10 then Rope.of_string "\\n"
-  else if n = 13 then Rope.of_string "\\r"
-  else if n = Char.code '\"' then Rope.of_string "\\\""
-  else if n = Char.code '\\' then Rope.of_string "\\\\"
-  else if n < 32 || n > 126 then Rope.of_string (Printf.sprintf "\\%03d" n)
+  if n = 8 then of_string "\\b"
+  else if n = 9 then of_string "\\t"
+  else if n = 10 then of_string "\\n"
+  else if n = 13 then of_string "\\r"
+  else if n = Char.code '\"' then of_string "\\\""
+  else if n = Char.code '\\' then of_string "\\\\"
+  else if n < 32 || n > 126 then of_string (Printf.sprintf "\\%03d" n)
   else char n
 ;;
 
@@ -28,7 +28,7 @@ let reference n =
 Hello_  my_         /      \        /     \
                    na      me_i    s      _Simon
 
-"Hello_/my_na_me_is_Simon" *)
+"Hello_my_name_is_Simon" *)
 
 let build_rope2 () = 
   let r1 = of_string "Hello_"
@@ -55,17 +55,17 @@ let build_rope2 () =
 let raw_string = build_rope char 256 [];;
 let ref_string = build_rope reference 256 [];;
 
-if Rope.escaped raw_string <> ref_string then failwith "test:Rope.escaped";;
+if escaped raw_string <> ref_string then failwith "test:Rope.escaped";;
 
 
 (* for this checking I am converting between rope and string 
 because a same string might have different rope representations *)
 let check_split sep s =
-  let r = Rope.of_string s in
-  let l = Rope.split_on_char sep r in
+  let r = of_string s in
+  let l = split_on_char sep r in
   assert(List.length l > 0);
-  assert(Rope.to_string (Rope.concat (Rope.make 1 sep) l) = s);
-  List.iter (Rope.iter (fun c -> assert (c <> sep))) l
+  assert(to_string (concat (make 1 sep) l) = s);
+  List.iter (iter (fun c -> assert (c <> sep))) l
 ;;  
 
 
@@ -75,6 +75,22 @@ let () =
     check_split ' ' (String.sub s 0 i)
   done
 ;;
+
+(* test length *)
+
+let () =
+  let r1 = empty
+  and r2 = empty 
+  in let r3 = r1 ^ r2 
+  in assert (length r3 = 0)
+
+
+(* test to_string *)
+
+let () = 
+  let r = build_rope2 () 
+  in assert(to_string r = "Hello_my_name_is_Simon")
+
 
 (* test sub *)
 
@@ -90,9 +106,9 @@ let () =
 (* test concat *)
 let () = 
   let sep = of_string "a"
-  and rl = [of_string "b"; of_string "c"]
+  and rl = [of_string "b"; of_string "c"; of_string "e"]
   in
-  assert (to_string (concat sep rl) = "bac") 
+  assert (to_string (concat sep rl) = "bacae") 
 
 (* test mapi *)
 
@@ -111,11 +127,27 @@ let () =
       of_string " a   b " ^ of_string " d e "
   in assert (to_string (trim r) = "a   b  d e")
 
-(* test rindex *)
+(* test rindex_from_opt *)
 let () = 
   let r = build_rope2 () in 
   assert(rindex_from_opt r 6 'S' = None);
   assert(rindex_from_opt r 21 'S' = Some 17)
+
+(* test compare *)
+
+let () = 
+  let r1 = build_rope2 ()
+  and r2 = of_string "Hello_my_name_is_Simom"
+  in assert ((compare r1 r2) > 0)
+
+(* test equals for different representation of the same string *)
+
+let () = 
+  let r1 = of_string "abc" 
+  and r2 = of_string "de" 
+  in let r3 = r1 ^ r2 
+  in let r4 = (r1 ^ empty) ^ (r2 ^ empty)
+  in assert (equal r3 r4)
 
 (* GPR#805/815/833 *)
 
