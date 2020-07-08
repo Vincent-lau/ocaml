@@ -577,6 +577,7 @@ module Bytes        = Bytes
 module BytesLabels  = BytesLabels
 module Callback     = Callback
 module Char         = Char
+module CompactRope  = CompactRope
 module Complex      = Complex
 module Digest       = Digest
 module Ephemeron    = Ephemeron
