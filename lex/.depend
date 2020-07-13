@@ -93,6 +93,20 @@ outputbis.cmi : \
     syntax.cmi \
     lexgen.cmi \
     common.cmi
+parser\ 2.cmo : \
+    syntax.cmi \
+    cset.cmi \
+    parser\ 2.cmi
+parser\ 2.cmx : \
+    syntax.cmx \
+    cset.cmx \
+    parser\ 2.cmi
+parser\ 2.cmi : \
+    syntax.cmi
+parser\ 3.cmi : \
+    syntax.cmi
+parser\ 4.cmi : \
+    syntax.cmi
 parser.cmo : \
     syntax.cmi \
     cset.cmi \

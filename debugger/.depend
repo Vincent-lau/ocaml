@@ -139,6 +139,10 @@ debugger_config.cmx : \
     int64ops.cmx \
     debugger_config.cmi
 debugger_config.cmi :
+debugger_lexer\ 2.cmo : \
+    debugger_parser.cmi
+debugger_lexer\ 2.cmx : \
+    debugger_parser.cmx
 debugger_lexer.cmo : \
     debugger_parser.cmi \
     debugger_lexer.cmi
@@ -147,6 +151,23 @@ debugger_lexer.cmx : \
     debugger_lexer.cmi
 debugger_lexer.cmi : \
     debugger_parser.cmi
+debugger_parser\ 2.cmo : \
+    parser_aux.cmi \
+    ../parsing/longident.cmi \
+    int64ops.cmi \
+    input_handling.cmi \
+    debugcom.cmi \
+    debugger_parser\ 2.cmi
+debugger_parser\ 2.cmx : \
+    parser_aux.cmi \
+    ../parsing/longident.cmx \
+    int64ops.cmx \
+    input_handling.cmx \
+    debugcom.cmx \
+    debugger_parser\ 2.cmi
+debugger_parser\ 2.cmi : \
+    parser_aux.cmi \
+    ../parsing/longident.cmi
 debugger_parser.cmo : \
     parser_aux.cmi \
     ../parsing/longident.cmi \

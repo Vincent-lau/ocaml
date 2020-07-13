@@ -28,6 +28,8 @@ cmpbyt.cmo : \
     ../bytecomp/bytesections.cmi
 cmpbyt.cmx : \
     ../bytecomp/bytesections.cmx
+cvt_emit\ 2.cmo :
+cvt_emit\ 2.cmx :
 cvt_emit.cmo :
 cvt_emit.cmx :
 dumpobj.cmo : \
@@ -82,6 +84,8 @@ lintapidiff.cmx : \
     ../utils/misc.cmx \
     ../parsing/location.cmx \
     ../typing/ident.cmx
+make_opcodes\ 2.cmo :
+make_opcodes\ 2.cmx :
 make_opcodes.cmo :
 make_opcodes.cmx :
 objinfo.cmo : \
@@ -132,6 +136,10 @@ ocamlmklib.cmx : \
     ocamlmklibconfig.cmx \
     ../utils/misc.cmx \
     ../utils/config.cmx
+ocamlmklibconfig\ 2.cmo :
+ocamlmklibconfig\ 2.cmx :
+ocamlmklibconfig\ 3.cmo :
+ocamlmklibconfig\ 3.cmx :
 ocamlmklibconfig.cmo :
 ocamlmklibconfig.cmx :
 ocamlmktop.cmo : \
@@ -152,6 +160,8 @@ ocamlprof.cmx : \
     ../parsing/parsetree.cmi \
     ../parsing/parse.cmx \
     ../parsing/location.cmx
+opnames\ 2.cmo :
+opnames\ 2.cmx :
 opnames.cmo :
 opnames.cmx :
 primreq.cmo : \

@@ -182,6 +182,23 @@ stdlib__char.cmo : \
 stdlib__char.cmx : \
     stdlib__char.cmi
 stdlib__char.cmi :
+stdlib__compactRope.cmo : \
+    stdlib__string.cmi \
+    stdlib.cmi \
+    stdlib__obj.cmi \
+    stdlib__list.cmi \
+    stdlib__char.cmi \
+    stdlib__bytes.cmi \
+    stdlib__compactRope.cmi
+stdlib__compactRope.cmx : \
+    stdlib__string.cmx \
+    stdlib.cmx \
+    stdlib__obj.cmx \
+    stdlib__list.cmx \
+    stdlib__char.cmx \
+    stdlib__bytes.cmx \
+    stdlib__compactRope.cmi
+stdlib__compactRope.cmi :
 stdlib__complex.cmo : \
     stdlib__complex.cmi
 stdlib__complex.cmx : \

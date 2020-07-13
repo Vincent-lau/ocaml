@@ -40,6 +40,10 @@ utils/clflags.cmx : \
 utils/clflags.cmi : \
     utils/profile.cmi \
     utils/misc.cmi
+utils/config\ 2.cmo :
+utils/config\ 2.cmx :
+utils/config\ 3.cmo :
+utils/config\ 3.cmx :
 utils/config.cmo : \
     utils/config.cmi
 utils/config.cmx : \
@@ -53,6 +57,11 @@ utils/consistbl.cmx : \
     utils/consistbl.cmi
 utils/consistbl.cmi : \
     utils/misc.cmi
+utils/domainstate\ 2.cmo : \
+    utils/domainstate\ 2.cmi
+utils/domainstate\ 2.cmx : \
+    utils/domainstate\ 2.cmi
+utils/domainstate\ 2.cmi :
 utils/domainstate.cmo : \
     utils/domainstate.cmi
 utils/domainstate.cmx : \
@@ -348,6 +357,12 @@ parsing/parse.cmx : \
 parsing/parse.cmi : \
     parsing/parsetree.cmi \
     parsing/longident.cmi
+parsing/parser\ 2.cmi : \
+    parsing/parsetree.cmi \
+    parsing/longident.cmi \
+    parsing/location.cmi \
+    parsing/docstrings.cmi \
+    parsing/camlinternalMenhirLib.cmi
 parsing/parser.cmo : \
     parsing/syntaxerr.cmi \
     parsing/parsetree.cmi \
@@ -1935,6 +1950,11 @@ bytecomp/meta.cmx : \
     bytecomp/meta.cmi
 bytecomp/meta.cmi : \
     bytecomp/instruct.cmi
+bytecomp/opcodes\ 2.cmo : \
+    bytecomp/opcodes\ 2.cmi
+bytecomp/opcodes\ 2.cmx : \
+    bytecomp/opcodes\ 2.cmi
+bytecomp/opcodes\ 2.cmi :
 bytecomp/opcodes.cmo : \
     bytecomp/opcodes.cmi
 bytecomp/opcodes.cmx : \
@@ -3368,6 +3388,8 @@ lambda/printlambda.cmx : \
 lambda/printlambda.cmi : \
     typing/types.cmi \
     lambda/lambda.cmi
+lambda/runtimedef\ 2.cmo :
+lambda/runtimedef\ 2.cmx :
 lambda/runtimedef.cmo : \
     lambda/runtimedef.cmi
 lambda/runtimedef.cmx : \
