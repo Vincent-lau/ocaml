@@ -205,7 +205,27 @@ void caml_oldify_one (value v, value *p)
     }else{
       CAMLassert_young_header(hd);
       tag = Tag_hd (hd);
-      if (tag < Infix_tag){
+      if (tag == Rope_tag){
+        printf("hello, I am a rope:)\n");
+        value field0;
+
+        sz = Wosize_hd (hd);
+        result = caml_alloc_shr_for_minor_gc (sz, tag, hd);
+        *p = result;
+        field0 = Field (v, 0);
+        Hd_val (v) = 0;            /* Set forward flag */
+        Field (v, 0) = result;     /*  and forward pointer. */
+        if (sz > 1){
+          Field (result, 0) = field0;
+          Field (result, 1) = oldify_todo_list;    /* Add this block */
+          oldify_todo_list = v;                    /*  to the "to do" list. */
+        }else{
+          CAMLassert (sz == 1);
+          p = &Field (result, 0);
+          v = field0;
+          goto tail_call;
+        }
+      }else if (tag < Infix_tag){
         value field0;
 
         sz = Wosize_hd (hd);

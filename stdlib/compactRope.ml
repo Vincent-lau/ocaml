@@ -22,12 +22,14 @@ type compactRope = t
 let leaf (s : string) : t = Obj.obj (Obj.repr s)
 
 
-let branch ~(leftlen:int) ~(left:t) ~(right:t) : t = 
+(* let branch ~(leftlen:int) ~(left:t) ~(right:t) : t = 
   let b = Obj.new_block 1 3 in 
   Obj.set_field b 0 (Obj.repr leftlen);
   Obj.set_field b 1 (Obj.repr left);
   Obj.set_field b 2 (Obj.repr right);
-  Obj.obj (Obj.repr b)
+  Obj.obj (Obj.repr b) *)
+
+external branch : int -> t -> t -> t = "caml_rope_branch"
 
 
 let destruct (r : t)
@@ -45,10 +47,15 @@ let destruct (r : t)
   end
 
 
-let rec length r = 
+(* let rec length r = 
   destruct r 
     ~lf: (fun s -> String.length s)
-    ~br: (fun ~leftlen ~left:_ ~right -> (leftlen + length right))
+    ~br: (fun ~leftlen ~left:_ ~right -> (leftlen + length right)) *)
+
+external length : t -> int = "caml_ml_rope_length"
+
+
+external to_string: t -> string = "caml_rope_to_string"
 
 let empty = leaf ""
 
@@ -58,7 +65,7 @@ let is_empty r = (length r = 0)
 let of_string s = leaf s
 
 
-let to_string r = 
+(* let to_string r = 
   let b = Bytes.create (length r) in
   let rec to_string_rec r b ofs = 
     destruct r 
@@ -67,13 +74,13 @@ let to_string r =
         to_string_rec left b ofs;
         to_string_rec right b (ofs + leftlen))
   in 
-  to_string_rec r b 0; b |> bts
+  to_string_rec r b 0; b |> bts *)
 
 
 let rope_concat r1 r2 = 
   if is_empty r1 then r2 
   else if is_empty r2 then r1
-  else branch ~leftlen:(length r1) ~left:r1 ~right:r2
+  else branch (length r1) r1 r2
 
 let (^) = rope_concat
 
@@ -174,7 +181,7 @@ let rec mapi_rec f ofs r =
       let l = mapi_rec f ofs left 
       and r = mapi_rec f (ofs + leftlen) right
       in
-      branch ~leftlen:leftlen ~left:l ~right:r)
+      l ^ r)
   
 
 let mapi f r = mapi_rec f 0 r
