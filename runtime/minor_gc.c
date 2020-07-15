@@ -35,11 +35,6 @@
 #include "caml/spacetime.h"
 #endif
 #include "caml/eventlog.h"
-#include "caml/str.h" 
-// the str.h is adde by me
-// this is just so that I can use caml_rope_length
-// maybe there is a more elegant way of doing this...
-// or could write this rope_length inline
 
 /* Pointers into the minor heap.
    [Caml_state->young_base]

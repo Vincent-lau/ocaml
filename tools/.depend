@@ -34,6 +34,8 @@ cvt_emit\ 3.cmo :
 cvt_emit\ 3.cmx :
 cvt_emit\ 4.cmo :
 cvt_emit\ 4.cmx :
+cvt_emit\ 5.cmo :
+cvt_emit\ 5.cmx :
 cvt_emit.cmo :
 cvt_emit.cmx :
 dumpobj.cmo : \
@@ -94,6 +96,8 @@ make_opcodes\ 11.cmo :
 make_opcodes\ 11.cmx :
 make_opcodes\ 12.cmo :
 make_opcodes\ 12.cmx :
+make_opcodes\ 13.cmo :
+make_opcodes\ 13.cmx :
 make_opcodes\ 2.cmo :
 make_opcodes\ 2.cmx :
 make_opcodes\ 3.cmo :

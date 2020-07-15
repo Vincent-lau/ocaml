@@ -143,6 +143,10 @@ debugger_lexer\ 10.cmo : \
     debugger_parser.cmi
 debugger_lexer\ 10.cmx : \
     debugger_parser.cmx
+debugger_lexer\ 11.cmo : \
+    debugger_parser.cmi
+debugger_lexer\ 11.cmx : \
+    debugger_parser.cmx
 debugger_lexer\ 2.cmo : \
     debugger_parser.cmi
 debugger_lexer\ 2.cmx : \
@@ -200,6 +204,20 @@ debugger_parser\ 10.cmx : \
 debugger_parser\ 10.cmi : \
     parser_aux.cmi \
     ../parsing/longident.cmi
+debugger_parser\ 11.cmo : \
+    parser_aux.cmi \
+    ../parsing/longident.cmi \
+    int64ops.cmi \
+    input_handling.cmi \
+    debugcom.cmi \
+    debugger_parser\ 11.cmi
+debugger_parser\ 11.cmx : \
+    parser_aux.cmi \
+    ../parsing/longident.cmx \
+    int64ops.cmx \
+    input_handling.cmx \
+    debugcom.cmx \
+    debugger_parser\ 11.cmi
 debugger_parser\ 11.cmi : \
     parser_aux.cmi \
     ../parsing/longident.cmi
@@ -207,6 +225,9 @@ debugger_parser\ 12.cmi : \
     parser_aux.cmi \
     ../parsing/longident.cmi
 debugger_parser\ 13.cmi : \
+    parser_aux.cmi \
+    ../parsing/longident.cmi
+debugger_parser\ 14.cmi : \
     parser_aux.cmi \
     ../parsing/longident.cmi
 debugger_parser\ 2.cmo : \

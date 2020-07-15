@@ -25,6 +25,8 @@ dynlink_platform_intf\ 7.cmi : \
     dynlink_types.cmi
 dynlink_platform_intf\ 8.cmi : \
     dynlink_types.cmi
+dynlink_platform_intf\ 9.cmi : \
+    dynlink_types.cmi
 dynlink_platform_intf.cmo : \
     dynlink_types.cmi \
     dynlink_platform_intf.cmi

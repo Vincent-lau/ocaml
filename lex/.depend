@@ -60,6 +60,18 @@ lexer\ 7.cmo : \
 lexer\ 7.cmx : \
     syntax.cmx \
     parser.cmx
+lexer\ 8.cmo : \
+    syntax.cmi \
+    parser.cmi
+lexer\ 8.cmx : \
+    syntax.cmx \
+    parser.cmx
+lexer\ 9.cmo : \
+    syntax.cmi \
+    parser.cmi
+lexer\ 9.cmx : \
+    syntax.cmx \
+    parser.cmx
 lexer.cmo : \
     syntax.cmi \
     parser.cmi \
@@ -129,8 +141,24 @@ outputbis.cmi : \
     syntax.cmi \
     lexgen.cmi \
     common.cmi
+parser\ 10.cmo : \
+    syntax.cmi \
+    cset.cmi \
+    parser\ 10.cmi
+parser\ 10.cmx : \
+    syntax.cmx \
+    cset.cmx \
+    parser\ 10.cmi
 parser\ 10.cmi : \
     syntax.cmi
+parser\ 11.cmo : \
+    syntax.cmi \
+    cset.cmi \
+    parser\ 11.cmi
+parser\ 11.cmx : \
+    syntax.cmx \
+    cset.cmx \
+    parser\ 11.cmi
 parser\ 11.cmi : \
     syntax.cmi
 parser\ 12.cmi : \
@@ -142,6 +170,10 @@ parser\ 14.cmi : \
 parser\ 15.cmi : \
     syntax.cmi
 parser\ 16.cmi : \
+    syntax.cmi
+parser\ 17.cmi : \
+    syntax.cmi
+parser\ 18.cmi : \
     syntax.cmi
 parser\ 2.cmo : \
     syntax.cmi \

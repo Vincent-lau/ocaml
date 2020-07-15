@@ -260,7 +260,9 @@ CAMLextern value caml_get_public_method (value obj, value tag);
 /* Another special case: variants */
 CAMLextern value caml_hash_variant(char const * tag);
 
+/* Ropes. */ 
 #define Rope_tag 245
+CAMLextern mlsize_t caml_rope_length (value); 
 
 /* 2- If tag >= No_scan_tag : a sequence of bytes. */
 
