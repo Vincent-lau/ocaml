@@ -24,6 +24,42 @@ cset.cmo : \
 cset.cmx : \
     cset.cmi
 cset.cmi :
+lexer\ 2.cmo : \
+    syntax.cmi \
+    parser.cmi
+lexer\ 2.cmx : \
+    syntax.cmx \
+    parser.cmx
+lexer\ 3.cmo : \
+    syntax.cmi \
+    parser.cmi
+lexer\ 3.cmx : \
+    syntax.cmx \
+    parser.cmx
+lexer\ 4.cmo : \
+    syntax.cmi \
+    parser.cmi
+lexer\ 4.cmx : \
+    syntax.cmx \
+    parser.cmx
+lexer\ 5.cmo : \
+    syntax.cmi \
+    parser.cmi
+lexer\ 5.cmx : \
+    syntax.cmx \
+    parser.cmx
+lexer\ 6.cmo : \
+    syntax.cmi \
+    parser.cmi
+lexer\ 6.cmx : \
+    syntax.cmx \
+    parser.cmx
+lexer\ 7.cmo : \
+    syntax.cmi \
+    parser.cmi
+lexer\ 7.cmx : \
+    syntax.cmx \
+    parser.cmx
 lexer.cmo : \
     syntax.cmi \
     parser.cmi \
@@ -93,6 +129,20 @@ outputbis.cmi : \
     syntax.cmi \
     lexgen.cmi \
     common.cmi
+parser\ 10.cmi : \
+    syntax.cmi
+parser\ 11.cmi : \
+    syntax.cmi
+parser\ 12.cmi : \
+    syntax.cmi
+parser\ 13.cmi : \
+    syntax.cmi
+parser\ 14.cmi : \
+    syntax.cmi
+parser\ 15.cmi : \
+    syntax.cmi
+parser\ 16.cmi : \
+    syntax.cmi
 parser\ 2.cmo : \
     syntax.cmi \
     cset.cmi \
@@ -103,9 +153,75 @@ parser\ 2.cmx : \
     parser\ 2.cmi
 parser\ 2.cmi : \
     syntax.cmi
+parser\ 3.cmo : \
+    syntax.cmi \
+    cset.cmi \
+    parser\ 3.cmi
+parser\ 3.cmx : \
+    syntax.cmx \
+    cset.cmx \
+    parser\ 3.cmi
 parser\ 3.cmi : \
     syntax.cmi
+parser\ 4.cmo : \
+    syntax.cmi \
+    cset.cmi \
+    parser\ 4.cmi
+parser\ 4.cmx : \
+    syntax.cmx \
+    cset.cmx \
+    parser\ 4.cmi
 parser\ 4.cmi : \
+    syntax.cmi
+parser\ 5.cmo : \
+    syntax.cmi \
+    cset.cmi \
+    parser\ 5.cmi
+parser\ 5.cmx : \
+    syntax.cmx \
+    cset.cmx \
+    parser\ 5.cmi
+parser\ 5.cmi : \
+    syntax.cmi
+parser\ 6.cmo : \
+    syntax.cmi \
+    cset.cmi \
+    parser\ 6.cmi
+parser\ 6.cmx : \
+    syntax.cmx \
+    cset.cmx \
+    parser\ 6.cmi
+parser\ 6.cmi : \
+    syntax.cmi
+parser\ 7.cmo : \
+    syntax.cmi \
+    cset.cmi \
+    parser\ 7.cmi
+parser\ 7.cmx : \
+    syntax.cmx \
+    cset.cmx \
+    parser\ 7.cmi
+parser\ 7.cmi : \
+    syntax.cmi
+parser\ 8.cmo : \
+    syntax.cmi \
+    cset.cmi \
+    parser\ 8.cmi
+parser\ 8.cmx : \
+    syntax.cmx \
+    cset.cmx \
+    parser\ 8.cmi
+parser\ 8.cmi : \
+    syntax.cmi
+parser\ 9.cmo : \
+    syntax.cmi \
+    cset.cmi \
+    parser\ 9.cmi
+parser\ 9.cmx : \
+    syntax.cmx \
+    cset.cmx \
+    parser\ 9.cmi
+parser\ 9.cmi : \
     syntax.cmi
 parser.cmo : \
     syntax.cmi \

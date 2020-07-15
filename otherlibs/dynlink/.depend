@@ -13,6 +13,18 @@ dynlink_common.cmi : \
     dynlink_platform_intf.cmi
 dynlink_platform_intf\ 2.cmi : \
     dynlink_types.cmi
+dynlink_platform_intf\ 3.cmi : \
+    dynlink_types.cmi
+dynlink_platform_intf\ 4.cmi : \
+    dynlink_types.cmi
+dynlink_platform_intf\ 5.cmi : \
+    dynlink_types.cmi
+dynlink_platform_intf\ 6.cmi : \
+    dynlink_types.cmi
+dynlink_platform_intf\ 7.cmi : \
+    dynlink_types.cmi
+dynlink_platform_intf\ 8.cmi : \
+    dynlink_types.cmi
 dynlink_platform_intf.cmo : \
     dynlink_types.cmi \
     dynlink_platform_intf.cmi

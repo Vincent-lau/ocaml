@@ -458,6 +458,76 @@ odoc_lexer\ 2.cmx : \
     odoc_messages.cmx \
     odoc_global.cmx \
     odoc_comments_global.cmx
+odoc_lexer\ 3.cmo : \
+    odoc_parser.cmi \
+    odoc_messages.cmo \
+    odoc_global.cmi \
+    odoc_comments_global.cmi
+odoc_lexer\ 3.cmx : \
+    odoc_parser.cmx \
+    odoc_messages.cmx \
+    odoc_global.cmx \
+    odoc_comments_global.cmx
+odoc_lexer\ 4.cmo : \
+    odoc_parser.cmi \
+    odoc_messages.cmo \
+    odoc_global.cmi \
+    odoc_comments_global.cmi
+odoc_lexer\ 4.cmx : \
+    odoc_parser.cmx \
+    odoc_messages.cmx \
+    odoc_global.cmx \
+    odoc_comments_global.cmx
+odoc_lexer\ 5.cmo : \
+    odoc_parser.cmi \
+    odoc_messages.cmo \
+    odoc_global.cmi \
+    odoc_comments_global.cmi
+odoc_lexer\ 5.cmx : \
+    odoc_parser.cmx \
+    odoc_messages.cmx \
+    odoc_global.cmx \
+    odoc_comments_global.cmx
+odoc_lexer\ 6.cmo : \
+    odoc_parser.cmi \
+    odoc_messages.cmo \
+    odoc_global.cmi \
+    odoc_comments_global.cmi
+odoc_lexer\ 6.cmx : \
+    odoc_parser.cmx \
+    odoc_messages.cmx \
+    odoc_global.cmx \
+    odoc_comments_global.cmx
+odoc_lexer\ 7.cmo : \
+    odoc_parser.cmi \
+    odoc_messages.cmo \
+    odoc_global.cmi \
+    odoc_comments_global.cmi
+odoc_lexer\ 7.cmx : \
+    odoc_parser.cmx \
+    odoc_messages.cmx \
+    odoc_global.cmx \
+    odoc_comments_global.cmx
+odoc_lexer\ 8.cmo : \
+    odoc_parser.cmi \
+    odoc_messages.cmo \
+    odoc_global.cmi \
+    odoc_comments_global.cmi
+odoc_lexer\ 8.cmx : \
+    odoc_parser.cmx \
+    odoc_messages.cmx \
+    odoc_global.cmx \
+    odoc_comments_global.cmx
+odoc_lexer\ 9.cmo : \
+    odoc_parser.cmi \
+    odoc_messages.cmo \
+    odoc_global.cmi \
+    odoc_comments_global.cmi
+odoc_lexer\ 9.cmx : \
+    odoc_parser.cmx \
+    odoc_messages.cmx \
+    odoc_global.cmx \
+    odoc_comments_global.cmx
 odoc_lexer.cmo : \
     odoc_parser.cmi \
     odoc_messages.cmo \
@@ -574,6 +644,20 @@ odoc_name.cmi : \
     ../typing/ident.cmi
 odoc_ocamlhtml\ 2.cmo :
 odoc_ocamlhtml\ 2.cmx :
+odoc_ocamlhtml\ 3.cmo :
+odoc_ocamlhtml\ 3.cmx :
+odoc_ocamlhtml\ 4.cmo :
+odoc_ocamlhtml\ 4.cmx :
+odoc_ocamlhtml\ 5.cmo :
+odoc_ocamlhtml\ 5.cmx :
+odoc_ocamlhtml\ 6.cmo :
+odoc_ocamlhtml\ 6.cmx :
+odoc_ocamlhtml\ 7.cmo :
+odoc_ocamlhtml\ 7.cmx :
+odoc_ocamlhtml\ 8.cmo :
+odoc_ocamlhtml\ 8.cmx :
+odoc_ocamlhtml\ 9.cmo :
+odoc_ocamlhtml\ 9.cmx :
 odoc_ocamlhtml.cmo :
 odoc_ocamlhtml.cmx :
 odoc_parameter.cmo : \
@@ -582,6 +666,30 @@ odoc_parameter.cmo : \
 odoc_parameter.cmx : \
     ../typing/types.cmx \
     odoc_types.cmx
+odoc_parser\ 10.cmo : \
+    odoc_types.cmi \
+    odoc_comments_global.cmi \
+    odoc_parser\ 10.cmi
+odoc_parser\ 10.cmx : \
+    odoc_types.cmx \
+    odoc_comments_global.cmx \
+    odoc_parser\ 10.cmi
+odoc_parser\ 10.cmi : \
+    odoc_types.cmi
+odoc_parser\ 11.cmo : \
+    odoc_types.cmi \
+    odoc_comments_global.cmi \
+    odoc_parser\ 11.cmi
+odoc_parser\ 11.cmx : \
+    odoc_types.cmx \
+    odoc_comments_global.cmx \
+    odoc_parser\ 11.cmi
+odoc_parser\ 11.cmi : \
+    odoc_types.cmi
+odoc_parser\ 12.cmi : \
+    odoc_types.cmi
+odoc_parser\ 13.cmi : \
+    odoc_types.cmi
 odoc_parser\ 2.cmo : \
     odoc_types.cmi \
     odoc_comments_global.cmi \
@@ -592,7 +700,75 @@ odoc_parser\ 2.cmx : \
     odoc_parser\ 2.cmi
 odoc_parser\ 2.cmi : \
     odoc_types.cmi
+odoc_parser\ 3.cmo : \
+    odoc_types.cmi \
+    odoc_comments_global.cmi \
+    odoc_parser\ 3.cmi
+odoc_parser\ 3.cmx : \
+    odoc_types.cmx \
+    odoc_comments_global.cmx \
+    odoc_parser\ 3.cmi
 odoc_parser\ 3.cmi : \
+    odoc_types.cmi
+odoc_parser\ 4.cmo : \
+    odoc_types.cmi \
+    odoc_comments_global.cmi \
+    odoc_parser\ 4.cmi
+odoc_parser\ 4.cmx : \
+    odoc_types.cmx \
+    odoc_comments_global.cmx \
+    odoc_parser\ 4.cmi
+odoc_parser\ 4.cmi : \
+    odoc_types.cmi
+odoc_parser\ 5.cmo : \
+    odoc_types.cmi \
+    odoc_comments_global.cmi \
+    odoc_parser\ 5.cmi
+odoc_parser\ 5.cmx : \
+    odoc_types.cmx \
+    odoc_comments_global.cmx \
+    odoc_parser\ 5.cmi
+odoc_parser\ 5.cmi : \
+    odoc_types.cmi
+odoc_parser\ 6.cmo : \
+    odoc_types.cmi \
+    odoc_comments_global.cmi \
+    odoc_parser\ 6.cmi
+odoc_parser\ 6.cmx : \
+    odoc_types.cmx \
+    odoc_comments_global.cmx \
+    odoc_parser\ 6.cmi
+odoc_parser\ 6.cmi : \
+    odoc_types.cmi
+odoc_parser\ 7.cmo : \
+    odoc_types.cmi \
+    odoc_comments_global.cmi \
+    odoc_parser\ 7.cmi
+odoc_parser\ 7.cmx : \
+    odoc_types.cmx \
+    odoc_comments_global.cmx \
+    odoc_parser\ 7.cmi
+odoc_parser\ 7.cmi : \
+    odoc_types.cmi
+odoc_parser\ 8.cmo : \
+    odoc_types.cmi \
+    odoc_comments_global.cmi \
+    odoc_parser\ 8.cmi
+odoc_parser\ 8.cmx : \
+    odoc_types.cmx \
+    odoc_comments_global.cmx \
+    odoc_parser\ 8.cmi
+odoc_parser\ 8.cmi : \
+    odoc_types.cmi
+odoc_parser\ 9.cmo : \
+    odoc_types.cmi \
+    odoc_comments_global.cmi \
+    odoc_parser\ 9.cmi
+odoc_parser\ 9.cmx : \
+    odoc_types.cmx \
+    odoc_comments_global.cmx \
+    odoc_parser\ 9.cmi
+odoc_parser\ 9.cmi : \
     odoc_types.cmi
 odoc_parser.cmo : \
     odoc_types.cmi \
@@ -660,9 +836,45 @@ odoc_search.cmi : \
     odoc_extension.cmo \
     odoc_exception.cmo \
     odoc_class.cmo
+odoc_see_lexer\ 10.cmo : \
+    odoc_parser.cmi
+odoc_see_lexer\ 10.cmx : \
+    odoc_parser.cmx
+odoc_see_lexer\ 11.cmo : \
+    odoc_parser.cmi
+odoc_see_lexer\ 11.cmx : \
+    odoc_parser.cmx
 odoc_see_lexer\ 2.cmo : \
     odoc_parser.cmi
 odoc_see_lexer\ 2.cmx : \
+    odoc_parser.cmx
+odoc_see_lexer\ 3.cmo : \
+    odoc_parser.cmi
+odoc_see_lexer\ 3.cmx : \
+    odoc_parser.cmx
+odoc_see_lexer\ 4.cmo : \
+    odoc_parser.cmi
+odoc_see_lexer\ 4.cmx : \
+    odoc_parser.cmx
+odoc_see_lexer\ 5.cmo : \
+    odoc_parser.cmi
+odoc_see_lexer\ 5.cmx : \
+    odoc_parser.cmx
+odoc_see_lexer\ 6.cmo : \
+    odoc_parser.cmi
+odoc_see_lexer\ 6.cmx : \
+    odoc_parser.cmx
+odoc_see_lexer\ 7.cmo : \
+    odoc_parser.cmi
+odoc_see_lexer\ 7.cmx : \
+    odoc_parser.cmx
+odoc_see_lexer\ 8.cmo : \
+    odoc_parser.cmi
+odoc_see_lexer\ 8.cmx : \
+    odoc_parser.cmx
+odoc_see_lexer\ 9.cmo : \
+    odoc_parser.cmi
+odoc_see_lexer\ 9.cmx : \
     odoc_parser.cmx
 odoc_see_lexer.cmo : \
     odoc_parser.cmi
@@ -800,12 +1012,60 @@ odoc_text_lexer\ 2.cmo : \
 odoc_text_lexer\ 2.cmx : \
     odoc_text_parser.cmx \
     odoc_misc.cmx
+odoc_text_lexer\ 3.cmo : \
+    odoc_text_parser.cmi \
+    odoc_misc.cmi
+odoc_text_lexer\ 3.cmx : \
+    odoc_text_parser.cmx \
+    odoc_misc.cmx
+odoc_text_lexer\ 4.cmo : \
+    odoc_text_parser.cmi \
+    odoc_misc.cmi
+odoc_text_lexer\ 4.cmx : \
+    odoc_text_parser.cmx \
+    odoc_misc.cmx
+odoc_text_lexer\ 5.cmo : \
+    odoc_text_parser.cmi \
+    odoc_misc.cmi
+odoc_text_lexer\ 5.cmx : \
+    odoc_text_parser.cmx \
+    odoc_misc.cmx
+odoc_text_lexer\ 6.cmo : \
+    odoc_text_parser.cmi \
+    odoc_misc.cmi
+odoc_text_lexer\ 6.cmx : \
+    odoc_text_parser.cmx \
+    odoc_misc.cmx
+odoc_text_lexer\ 7.cmo : \
+    odoc_text_parser.cmi \
+    odoc_misc.cmi
+odoc_text_lexer\ 7.cmx : \
+    odoc_text_parser.cmx \
+    odoc_misc.cmx
+odoc_text_lexer\ 8.cmo : \
+    odoc_text_parser.cmi \
+    odoc_misc.cmi
+odoc_text_lexer\ 8.cmx : \
+    odoc_text_parser.cmx \
+    odoc_misc.cmx
+odoc_text_lexer\ 9.cmo : \
+    odoc_text_parser.cmi \
+    odoc_misc.cmi
+odoc_text_lexer\ 9.cmx : \
+    odoc_text_parser.cmx \
+    odoc_misc.cmx
 odoc_text_lexer.cmo : \
     odoc_text_parser.cmi \
     odoc_misc.cmi
 odoc_text_lexer.cmx : \
     odoc_text_parser.cmx \
     odoc_misc.cmx
+odoc_text_parser\ 10.cmi : \
+    odoc_types.cmi
+odoc_text_parser\ 11.cmi : \
+    odoc_types.cmi
+odoc_text_parser\ 12.cmi : \
+    odoc_types.cmi
 odoc_text_parser\ 2.cmo : \
     odoc_types.cmi \
     odoc_misc.cmi \
@@ -815,6 +1075,76 @@ odoc_text_parser\ 2.cmx : \
     odoc_misc.cmx \
     odoc_text_parser\ 2.cmi
 odoc_text_parser\ 2.cmi : \
+    odoc_types.cmi
+odoc_text_parser\ 3.cmo : \
+    odoc_types.cmi \
+    odoc_misc.cmi \
+    odoc_text_parser\ 3.cmi
+odoc_text_parser\ 3.cmx : \
+    odoc_types.cmx \
+    odoc_misc.cmx \
+    odoc_text_parser\ 3.cmi
+odoc_text_parser\ 3.cmi : \
+    odoc_types.cmi
+odoc_text_parser\ 4.cmo : \
+    odoc_types.cmi \
+    odoc_misc.cmi \
+    odoc_text_parser\ 4.cmi
+odoc_text_parser\ 4.cmx : \
+    odoc_types.cmx \
+    odoc_misc.cmx \
+    odoc_text_parser\ 4.cmi
+odoc_text_parser\ 4.cmi : \
+    odoc_types.cmi
+odoc_text_parser\ 5.cmo : \
+    odoc_types.cmi \
+    odoc_misc.cmi \
+    odoc_text_parser\ 5.cmi
+odoc_text_parser\ 5.cmx : \
+    odoc_types.cmx \
+    odoc_misc.cmx \
+    odoc_text_parser\ 5.cmi
+odoc_text_parser\ 5.cmi : \
+    odoc_types.cmi
+odoc_text_parser\ 6.cmo : \
+    odoc_types.cmi \
+    odoc_misc.cmi \
+    odoc_text_parser\ 6.cmi
+odoc_text_parser\ 6.cmx : \
+    odoc_types.cmx \
+    odoc_misc.cmx \
+    odoc_text_parser\ 6.cmi
+odoc_text_parser\ 6.cmi : \
+    odoc_types.cmi
+odoc_text_parser\ 7.cmo : \
+    odoc_types.cmi \
+    odoc_misc.cmi \
+    odoc_text_parser\ 7.cmi
+odoc_text_parser\ 7.cmx : \
+    odoc_types.cmx \
+    odoc_misc.cmx \
+    odoc_text_parser\ 7.cmi
+odoc_text_parser\ 7.cmi : \
+    odoc_types.cmi
+odoc_text_parser\ 8.cmo : \
+    odoc_types.cmi \
+    odoc_misc.cmi \
+    odoc_text_parser\ 8.cmi
+odoc_text_parser\ 8.cmx : \
+    odoc_types.cmx \
+    odoc_misc.cmx \
+    odoc_text_parser\ 8.cmi
+odoc_text_parser\ 8.cmi : \
+    odoc_types.cmi
+odoc_text_parser\ 9.cmo : \
+    odoc_types.cmi \
+    odoc_misc.cmi \
+    odoc_text_parser\ 9.cmi
+odoc_text_parser\ 9.cmx : \
+    odoc_types.cmx \
+    odoc_misc.cmx \
+    odoc_text_parser\ 9.cmi
+odoc_text_parser\ 9.cmi : \
     odoc_types.cmi
 odoc_text_parser.cmo : \
     odoc_types.cmi \

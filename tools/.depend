@@ -30,6 +30,10 @@ cmpbyt.cmx : \
     ../bytecomp/bytesections.cmx
 cvt_emit\ 2.cmo :
 cvt_emit\ 2.cmx :
+cvt_emit\ 3.cmo :
+cvt_emit\ 3.cmx :
+cvt_emit\ 4.cmo :
+cvt_emit\ 4.cmx :
 cvt_emit.cmo :
 cvt_emit.cmx :
 dumpobj.cmo : \
@@ -84,8 +88,28 @@ lintapidiff.cmx : \
     ../utils/misc.cmx \
     ../parsing/location.cmx \
     ../typing/ident.cmx
+make_opcodes\ 10.cmo :
+make_opcodes\ 10.cmx :
+make_opcodes\ 11.cmo :
+make_opcodes\ 11.cmx :
+make_opcodes\ 12.cmo :
+make_opcodes\ 12.cmx :
 make_opcodes\ 2.cmo :
 make_opcodes\ 2.cmx :
+make_opcodes\ 3.cmo :
+make_opcodes\ 3.cmx :
+make_opcodes\ 4.cmo :
+make_opcodes\ 4.cmx :
+make_opcodes\ 5.cmo :
+make_opcodes\ 5.cmx :
+make_opcodes\ 6.cmo :
+make_opcodes\ 6.cmx :
+make_opcodes\ 7.cmo :
+make_opcodes\ 7.cmx :
+make_opcodes\ 8.cmo :
+make_opcodes\ 8.cmx :
+make_opcodes\ 9.cmo :
+make_opcodes\ 9.cmx :
 make_opcodes.cmo :
 make_opcodes.cmx :
 objinfo.cmo : \
@@ -136,10 +160,40 @@ ocamlmklib.cmx : \
     ocamlmklibconfig.cmx \
     ../utils/misc.cmx \
     ../utils/config.cmx
+ocamlmklibconfig\ 10.cmo :
+ocamlmklibconfig\ 10.cmx :
+ocamlmklibconfig\ 11.cmo :
+ocamlmklibconfig\ 11.cmx :
+ocamlmklibconfig\ 12.cmo :
+ocamlmklibconfig\ 12.cmx :
+ocamlmklibconfig\ 13.cmo :
+ocamlmklibconfig\ 13.cmx :
+ocamlmklibconfig\ 14.cmo :
+ocamlmklibconfig\ 14.cmx :
+ocamlmklibconfig\ 15.cmo :
+ocamlmklibconfig\ 15.cmx :
+ocamlmklibconfig\ 16.cmo :
+ocamlmklibconfig\ 16.cmx :
+ocamlmklibconfig\ 17.cmo :
+ocamlmklibconfig\ 17.cmx :
+ocamlmklibconfig\ 18.cmo :
+ocamlmklibconfig\ 18.cmx :
 ocamlmklibconfig\ 2.cmo :
 ocamlmklibconfig\ 2.cmx :
 ocamlmklibconfig\ 3.cmo :
 ocamlmklibconfig\ 3.cmx :
+ocamlmklibconfig\ 4.cmo :
+ocamlmklibconfig\ 4.cmx :
+ocamlmklibconfig\ 5.cmo :
+ocamlmklibconfig\ 5.cmx :
+ocamlmklibconfig\ 6.cmo :
+ocamlmklibconfig\ 6.cmx :
+ocamlmklibconfig\ 7.cmo :
+ocamlmklibconfig\ 7.cmx :
+ocamlmklibconfig\ 8.cmo :
+ocamlmklibconfig\ 8.cmx :
+ocamlmklibconfig\ 9.cmo :
+ocamlmklibconfig\ 9.cmx :
 ocamlmklibconfig.cmo :
 ocamlmklibconfig.cmx :
 ocamlmktop.cmo : \
@@ -160,8 +214,36 @@ ocamlprof.cmx : \
     ../parsing/parsetree.cmi \
     ../parsing/parse.cmx \
     ../parsing/location.cmx
+opnames\ 10.cmo :
+opnames\ 10.cmx :
+opnames\ 11.cmo :
+opnames\ 11.cmx :
+opnames\ 12.cmo :
+opnames\ 12.cmx :
+opnames\ 13.cmo :
+opnames\ 13.cmx :
+opnames\ 14.cmo :
+opnames\ 14.cmx :
+opnames\ 15.cmo :
+opnames\ 15.cmx :
+opnames\ 16.cmo :
+opnames\ 16.cmx :
 opnames\ 2.cmo :
 opnames\ 2.cmx :
+opnames\ 3.cmo :
+opnames\ 3.cmx :
+opnames\ 4.cmo :
+opnames\ 4.cmx :
+opnames\ 5.cmo :
+opnames\ 5.cmx :
+opnames\ 6.cmo :
+opnames\ 6.cmx :
+opnames\ 7.cmo :
+opnames\ 7.cmx :
+opnames\ 8.cmo :
+opnames\ 8.cmx :
+opnames\ 9.cmo :
+opnames\ 9.cmx :
 opnames.cmo :
 opnames.cmx :
 primreq.cmo : \
