@@ -474,14 +474,21 @@ CAMLprim value caml_bytes_of_string(value bv)
 }
 
 CAMLprim mlsize_t caml_rope_length(value r){
-    if(Tag_val(r) == String_tag)
-        return caml_string_length(r);
-    else{
-        CAMLassert(Tag_val(r) == 1);
+    if(Tag_val(r) == String_tag){
+      return caml_string_length(r);
+    }
+    else if (Tag_val(r) == Rope_tag){
         value leftlen = Field(r, 0);
         value right = Field(r, 2);
         return Unsigned_long_val(leftlen) + caml_rope_length(right);
     } 
+    else{
+      // similar to the case in caml_oldify_rope where children might have been forwarded
+      // printf("caml_rope_length:  tag : %d, is_young : %d, is_block : %d, header : %lu\n", 
+      // Tag_val(r), Is_young(r), Is_block(r), Hd_val(r));
+      CAMLassert(Hd_val(r) == 0);
+      return caml_rope_length(Field(r, 0));
+    }
 }
 
 CAMLprim value caml_ml_rope_length(value r){
@@ -494,10 +501,11 @@ CAMLprim value caml_rope_to_string_rec(value r, value b, value ofs)
         caml_blit_bytes(r, Val_int(0), b, ofs, caml_ml_string_length(r));           
     }
     else{
-        CAMLassert(Tag_val(r) == 1);
-        value leftlen = Field(r, 0);
-        value left = Field(r, 1);
-        value right = Field(r, 2);
+        value leftlen, left, right;
+        CAMLassert(Tag_val(r) == Rope_tag);
+        leftlen = Field(r, 0);
+        left = Field(r, 1);
+        right = Field(r, 2);
         caml_rope_to_string_rec(left, b, ofs);
         caml_rope_to_string_rec(right, b, Val_long(Long_val(leftlen) + Long_val(ofs)));
     }
