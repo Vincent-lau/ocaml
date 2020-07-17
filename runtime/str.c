@@ -472,3 +472,62 @@ CAMLprim value caml_bytes_of_string(value bv)
 {
   return bv;
 }
+
+CAMLexport mlsize_t caml_rope_length(value r){
+  if(Tag_val(r) == String_tag){
+    return caml_string_length(r);
+  }
+  else if (Tag_val(r) == Rope_tag){
+      value leftlen = Field(r, 0);
+      value right = Field(r, 2);
+      return Unsigned_long_val(leftlen) + caml_rope_length(right);
+  } 
+  else{
+    // similar to the case in caml_oldify_rope where children might have been forwarded
+    // printf("caml_rope_length:  tag : %d, is_young : %d, is_block : %d, header : %lu\n", 
+    // Tag_val(r), Is_young(r), Is_block(r), Hd_val(r));
+    CAMLassert(Hd_val(r) == 0);
+    return caml_rope_length(Field(r, 0));
+  }
+}
+
+CAMLprim value caml_ml_rope_length(value r){
+    return Val_long(caml_rope_length(r));   
+}
+
+CAMLprim value caml_rope_to_string_rec(value r, value b, value ofs)
+{
+  if (Tag_val(r) == String_tag){
+      caml_blit_bytes(r, Val_int(0), b, ofs, caml_ml_string_length(r));           
+  }
+  else{
+      value leftlen, left, right;
+      CAMLassert(Tag_val(r) == Rope_tag);
+      leftlen = Field(r, 0);
+      left = Field(r, 1);
+      right = Field(r, 2);
+      caml_rope_to_string_rec(left, b, ofs);
+      caml_rope_to_string_rec(right, b, Val_long(Long_val(leftlen) + Long_val(ofs)));
+  }
+  return Val_unit;
+}
+
+CAMLprim value caml_rope_to_string(value r)
+{
+  CAMLparam1(r);
+  CAMLlocal2(b, len);
+  len = caml_ml_rope_length(r);
+  b = caml_create_bytes(len);
+  caml_rope_to_string_rec(r, b, Val_int(0));
+  CAMLreturn(b);
+}
+
+CAMLprim value caml_rope_branch(value leftlen, value left, value right){
+  CAMLparam3(leftlen, left, right);
+  CAMLlocal1(b);
+  b = caml_alloc_small(3, Rope_tag);
+  Field(b, 0) = leftlen;
+  Field(b, 1) = left;
+  Field(b, 2) = right;
+  CAMLreturn(b);
+}
