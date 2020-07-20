@@ -84,4 +84,6 @@ STDLIB_MODULES=\
   $(P)spacetime \
   $(P)bigarray \
   $(P)rope \
-  $(P)compactRope
+  $(P)compactRope \
+  $(P)ropeBuffer \
+  $(P)compactRopeBuffer

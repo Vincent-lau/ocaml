@@ -187,6 +187,27 @@ stdlib__compactRope.cmx : \
     stdlib__bytes.cmx \
     stdlib__compactRope.cmi
 stdlib__compactRope.cmi :
+stdlib__compactRopeBuffer.cmo : \
+    stdlib__uchar.cmi \
+    stdlib__sys.cmi \
+    stdlib__string.cmi \
+    stdlib__seq.cmi \
+    stdlib__compactRope.cmi \
+    stdlib__char.cmi \
+    stdlib__bytes.cmi \
+    stdlib__compactRopeBuffer.cmi
+stdlib__compactRopeBuffer.cmx : \
+    stdlib__uchar.cmx \
+    stdlib__sys.cmx \
+    stdlib__string.cmx \
+    stdlib__seq.cmx \
+    stdlib__compactRope.cmx \
+    stdlib__char.cmx \
+    stdlib__bytes.cmx \
+    stdlib__compactRopeBuffer.cmi
+stdlib__compactRopeBuffer.cmi : \
+    stdlib__uchar.cmi \
+    stdlib__seq.cmi
 stdlib__complex.cmo : \
     stdlib__complex.cmi
 stdlib__complex.cmx : \
@@ -570,6 +591,27 @@ stdlib__rope.cmx : \
     stdlib__bytes.cmx \
     stdlib__rope.cmi
 stdlib__rope.cmi :
+stdlib__ropeBuffer.cmo : \
+    stdlib__uchar.cmi \
+    stdlib__sys.cmi \
+    stdlib__string.cmi \
+    stdlib__seq.cmi \
+    stdlib__rope.cmi \
+    stdlib__char.cmi \
+    stdlib__bytes.cmi \
+    stdlib__ropeBuffer.cmi
+stdlib__ropeBuffer.cmx : \
+    stdlib__uchar.cmx \
+    stdlib__sys.cmx \
+    stdlib__string.cmx \
+    stdlib__seq.cmx \
+    stdlib__rope.cmx \
+    stdlib__char.cmx \
+    stdlib__bytes.cmx \
+    stdlib__ropeBuffer.cmi
+stdlib__ropeBuffer.cmi : \
+    stdlib__uchar.cmi \
+    stdlib__seq.cmi
 stdlib__scanf.cmo : \
     stdlib__string.cmi \
     stdlib.cmi \

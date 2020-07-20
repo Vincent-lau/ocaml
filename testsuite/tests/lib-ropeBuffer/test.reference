@@ -1,0 +1,9 @@
+Standard Library: Module RopeBuffer
+RopeBuffer truncate: negative passed
+RopeBuffer truncate: large passed
+RopeBuffer truncate: in-range passed
+RopeBuffer reset: non-zero passed
+RopeBuffer reset: zero passed
+RopeBuffer add_utf_8_uchar: test against spec passed
+RopeBuffer add_utf_16be_uchar: test against spec passed
+RopeBuffer add_utf_16le_uchar: test against spec passed

@@ -1,0 +1,9 @@
+Standard Library: Module CompactRopeBuffer
+CompactRopeBuffer truncate: negative passed
+CompactRopeBuffer truncate: large passed
+CompactRopeBuffer truncate: in-range passed
+CompactRopeBuffer reset: non-zero passed
+CompactRopeBuffer reset: zero passed
+CompactRopeBuffer add_utf_8_uchar: test against spec passed
+CompactRopeBuffer add_utf_16be_uchar: test against spec passed
+CompactRopeBuffer add_utf_16le_uchar: test against spec passed

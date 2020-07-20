@@ -233,7 +233,7 @@ void caml_oldify_one (value v, value *p)
       tag = Tag_hd (hd);
       if (tag == Rope_tag){
         mlsize_t len, wosize, offset_index;
-        printf("hello, I am a rope:)\n");
+        // printf("hello, I am a rope:)\n");
         
         len = caml_rope_length(v);
         wosize = Wsize_bsize(len) + 1; // size in words, +1 for padding
