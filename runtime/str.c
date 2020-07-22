@@ -477,9 +477,9 @@ CAMLexport mlsize_t caml_rope_length(value r){
   if(Tag_val(r) == String_tag){
     return caml_string_length(r);
   }
-  else if (Tag_val(r) == Rope_tag){
-      value leftlen = Field(r, 0);
-      value right = Field(r, 2);
+  else if (Tag_val(r) == Promote_tag){
+      value leftlen = Field(r, 1);
+      value right = Field(r, 3);
       return Unsigned_long_val(leftlen) + caml_rope_length(right);
   } 
   else{
@@ -502,10 +502,10 @@ CAMLprim value caml_rope_to_string_rec(value r, value b, value ofs)
   }
   else{
       value leftlen, left, right;
-      CAMLassert(Tag_val(r) == Rope_tag);
-      leftlen = Field(r, 0);
-      left = Field(r, 1);
-      right = Field(r, 2);
+      CAMLassert(Tag_val(r) == Promote_tag);
+      leftlen = Field(r, 1);
+      left = Field(r, 2);
+      right = Field(r, 3);
       caml_rope_to_string_rec(left, b, ofs);
       caml_rope_to_string_rec(right, b, Val_long(Long_val(leftlen) + Long_val(ofs)));
   }
@@ -522,12 +522,75 @@ CAMLprim value caml_rope_to_string(value r)
   CAMLreturn(b);
 }
 
+
+value caml_get_rope_promoter(void);
+
+
 CAMLprim value caml_rope_branch(value leftlen, value left, value right){
   CAMLparam3(leftlen, left, right);
   CAMLlocal1(b);
-  b = caml_alloc_small(3, Rope_tag);
-  Field(b, 0) = leftlen;
-  Field(b, 1) = left;
-  Field(b, 2) = right;
+  b = caml_alloc_small(4, Promote_tag);
+  Field(b, 0) = caml_get_rope_promoter();
+  Field(b, 1) = leftlen;
+  Field(b, 2) = left;
+  Field(b, 3) = right;
   CAMLreturn(b);
+}
+
+
+
+void caml_oldify_rope_promotion (value v, char *pc, mlsize_t ofs){
+  CAMLassert(Is_young(v) && Is_block(v));
+  if (Tag_val(v) == String_tag){
+    char *s = Bp_val(v);
+    strcpy(pc + ofs, s);
+  }
+  else if (Tag_val(v) == Promote_tag){
+    mlsize_t leftlen = Unsigned_long_val(Field(v, 1));
+    value left = Field(v, 2);
+    value right = Field(v, 3);
+    caml_oldify_rope_promotion(left, pc, ofs);
+    caml_oldify_rope_promotion(right, pc, ofs + leftlen);
+  }
+  else{ 
+    // it might be that the children of a rope have been already forwarded
+    // i.e. header is 0
+    // the printing statement are just to check this
+
+    // printf("caml_oldify_rope: tag : %d, is_young : %d, is_block : %d, header : %lu\n", 
+    // Tag_val(v), Is_young(v), Is_block(v), Hd_val(v));
+    // printf("and the forward pointer is pointing to a tag: %d, whose content is %s\n",
+    // Tag_val(Field(v,0)), Bp_val(Field(v, 0)) );
+
+    CAMLassert(Hd_val(v) == 0);
+    caml_oldify_rope_promotion(Field(v, 0), pc, ofs);
+  }
+}
+
+value caml_oldify_rope(value v, value *p, header_t hd){
+  // not sure if CAMLparam, CAMLreturn is needed
+  // but since they are not used in other code in caml_oldify_one
+  // it's probably not needed
+
+  value result;
+  mlsize_t sz, i;
+  mlsize_t len, offset_index;
+  // printf("hello, I am a rope:)\n");
+  
+  len = caml_rope_length(v);
+  sz = Wsize_bsize(len) + 1; // size in words, +1 for padding
+  
+  result = caml_alloc_shr_for_minor_gc(sz, String_tag, hd);
+  caml_oldify_rope_promotion(v, Bp_val(result), 0);
+  // need to preserve the padding of the string
+  offset_index = Bsize_wsize (sz) - 1;
+  for(i = len; i < offset_index; ++i)
+    Byte(result, i) = 0;
+  Byte (result, offset_index) = offset_index - len;
+  return result;
+}
+
+value caml_get_rope_promoter(void){
+  value (*fun_ptr)(value, value *, header_t) = &caml_oldify_rope;
+  return Val_long(((long) fun_ptr));
 }

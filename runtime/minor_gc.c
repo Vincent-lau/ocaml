@@ -180,36 +180,6 @@ void caml_set_minor_heap_size (asize_t bsz)
   reset_table ((struct generic_table *) Caml_state->custom_table);
 }
 
-void caml_oldify_rope (value v, char *pc, mlsize_t ofs){
-  // CAMLassert(Is_young(r) && Is_block(r));
-
-  if (Tag_val(v) == String_tag){
-    char *s = Bp_val(v);
-    strcpy(pc + ofs, s);
-  }
-  else if (Tag_val(v) == Rope_tag){
-    mlsize_t leftlen = Unsigned_long_val(Field(v, 0));
-    value left = Field(v, 1);
-    value right = Field(v, 2);
-    caml_oldify_rope(left, pc, ofs);
-    caml_oldify_rope(right, pc, ofs + leftlen);
-
-  }
-  else{ 
-    // it might be that the children of a rope have been already forwarded
-    // i.e. header is 0
-    // the printing statement are just to check this
-
-    // printf("caml_oldify_rope: tag : %d, is_young : %d, is_block : %d, header : %lu\n", 
-    // Tag_val(v), Is_young(v), Is_block(v), Hd_val(v));
-    // printf("and the forward pointer is pointing to a tag: %d, whose content is %s\n",
-    // Tag_val(Field(v,0)), Bp_val(Field(v, 0)) );
-
-    CAMLassert(Hd_val(v) == 0);
-    caml_oldify_rope(Field(v, 0), pc, ofs);
-  }
-  
-}
 
 static value oldify_todo_list = 0;
 
@@ -231,25 +201,20 @@ void caml_oldify_one (value v, value *p)
       *p = Field (v, 0);  /*  then forward pointer is first field. */
     }else{
       tag = Tag_hd (hd);
-      if (tag == Rope_tag){
-        mlsize_t len, wosize, offset_index;
-        // printf("hello, I am a rope:)\n");
-        
-        len = caml_rope_length(v);
-        wosize = Wsize_bsize(len) + 1; // size in words, +1 for padding
-        
-        result = caml_alloc_shr_for_minor_gc(wosize, String_tag, hd);
-        caml_oldify_rope(v, Bp_val(result), 0);
-        // need to preserve the padding of the string
-        offset_index = Bsize_wsize (wosize) - 1;
-        for(i = len; i < offset_index; ++i)
-          Byte(result, i) = 0;
-        Byte (result, offset_index) = offset_index - len;
-        
-        Hd_val (v) = 0;            /* Set forward flag */
+      if (tag == Promote_tag){
+        // here this promote_fun accepts two value *
+        // this is because we need to set the forward pointer
+        // i.e. modify the value of v
+        // we could have a promote_fun that accepts an additional
+        // value *result and setting the forward flag and pointer here
+        // rather than in the caml_oldify_rope function
+        typedef value (promote_fun)(value, value *, header_t);
+        promote_fun *promoter;
+        promoter = (promote_fun *) (Long_val(Field(v, 0)));
+        result = (*promoter)(v, p, hd);
+        Hd_val(v) = 0;            /* Set forward flag */
         Field (v, 0) = result;     /*  and forward pointer. */
         *p = result;
-
       }else if (tag < Infix_tag){
         value field0;
 

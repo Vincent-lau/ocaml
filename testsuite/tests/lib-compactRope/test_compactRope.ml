@@ -3,9 +3,8 @@
 open CompactRope;;
 
 let rec build_rope f n accu =
-  if n <= 0
-    then concat (of_string "") accu
-    else build_rope f (n-1) (f (n-1) :: accu)
+  if n <= 0 then concat empty accu
+  else build_rope f (n-1) (f (n-1) :: accu)
 ;;
 
 let char n = make 1 (Char.chr n);;
@@ -53,7 +52,9 @@ let build_rope2 () =
 
 
 let raw_string = build_rope char 256 [];;
+
 let ref_string = build_rope reference 256 [];;
+
 
 if escaped raw_string <> ref_string then failwith "test:CompactRope.escaped";;
 
@@ -86,7 +87,6 @@ let () =
 
 
 (* test to_string *)
-
 let () = 
   let r = build_rope2 () 
   in assert(to_string r = "Hello_my_name_is_Simon")

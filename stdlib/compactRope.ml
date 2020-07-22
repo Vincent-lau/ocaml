@@ -40,10 +40,10 @@ let destruct (r : t)
     lf (Obj.obj rt_r) 
   else 
   begin
-    assert (Obj.tag rt_r = Obj.rope_tag);
-    br ~leftlen:(Obj.obj (Obj.repr (Obj.field rt_r 0)) : int)
-      ~left:(Obj.obj (Obj.repr (Obj.field rt_r 1)) : t)
-      ~right:(Obj.obj (Obj.repr (Obj.field rt_r 2)) : t)
+    assert (Obj.tag rt_r = Obj.promote_tag);
+    br ~leftlen:(Obj.obj (Obj.repr (Obj.field rt_r 1)) : int)
+      ~left:(Obj.obj (Obj.repr (Obj.field rt_r 2)) : t)
+      ~right:(Obj.obj (Obj.repr (Obj.field rt_r 3)) : t)
   end
 
 
