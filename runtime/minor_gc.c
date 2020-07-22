@@ -202,16 +202,14 @@ void caml_oldify_one (value v, value *p)
     }else{
       tag = Tag_hd (hd);
       if (tag == Promote_tag){
-        // here this promote_fun accepts two value *
-        // this is because we need to set the forward pointer
-        // i.e. modify the value of v
-        // we could have a promote_fun that accepts an additional
-        // value *result and setting the forward flag and pointer here
-        // rather than in the caml_oldify_rope function
         typedef value (promote_fun)(value, value *, header_t);
         promote_fun *promoter;
         promoter = (promote_fun *) (Long_val(Field(v, 0)));
         result = (*promoter)(v, p, hd);
+        // I left the forwarding process here
+        // could move them into caml_oldify rope
+        // although the signature of the promote_fun
+        // would be slightly different
         Hd_val(v) = 0;            /* Set forward flag */
         Field (v, 0) = result;     /*  and forward pointer. */
         *p = result;
