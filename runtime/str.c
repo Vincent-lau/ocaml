@@ -523,7 +523,7 @@ CAMLprim value caml_rope_to_string(value r)
 }
 
 
-value caml_get_rope_promoter(void);
+static value caml_get_rope_promoter(void);
 
 
 CAMLprim value caml_rope_branch(value leftlen, value left, value right){
@@ -539,7 +539,7 @@ CAMLprim value caml_rope_branch(value leftlen, value left, value right){
 
 
 
-void caml_oldify_rope_promotion (value v, char *pc, mlsize_t ofs){
+static void caml_oldify_rope_promotion (value v, char *pc, mlsize_t ofs){
   CAMLassert(Is_young(v) && Is_block(v));
   if (Tag_val(v) == String_tag){
     char *s = Bp_val(v);
@@ -567,7 +567,7 @@ void caml_oldify_rope_promotion (value v, char *pc, mlsize_t ofs){
   }
 }
 
-value caml_oldify_rope(value v, value *p, header_t hd){
+static value caml_oldify_rope(value v, value *p, header_t hd){
   // not sure if CAMLparam, CAMLreturn is needed
   // but since they are not used in other code in caml_oldify_one
   // it's probably not needed
@@ -590,7 +590,7 @@ value caml_oldify_rope(value v, value *p, header_t hd){
   return result;
 }
 
-value caml_get_rope_promoter(void){
+static value caml_get_rope_promoter(void){
   value (*fun_ptr)(value, value *, header_t) = &caml_oldify_rope;
   return Val_long(((long) fun_ptr));
 }
