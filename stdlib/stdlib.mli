@@ -1384,6 +1384,7 @@ module StdLabels    = StdLabels
 module Stream       = Stream
 module String       = String
 module StringLabels = StringLabels
+module SubRope      = SubRope
 module Sys          = Sys
 module Uchar        = Uchar
 module Unit         = Unit
