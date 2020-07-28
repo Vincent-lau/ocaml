@@ -13,10 +13,16 @@ let bos = B.unsafe_of_string
 
 let empty = Leaf ""
 
+let of_string s = Leaf s
+
+
+
 let rec length = function
   | Leaf str -> String.length str
   | Branch b -> b.leftlen + length b.right
   | Sub sub -> sub.len
+
+
 
 let rope_concat r1 r2 = 
   if r1 = empty then r2 
@@ -27,89 +33,6 @@ let (^) = rope_concat
 
 let is_empty r = (length r = 0)
 
-let rec sub_helper r start len 
-  ~(lf:string -> 'a)
-  ~(br:'a ->'a -> 'a)
-  = match r with
-    | Leaf str -> 
-      lf (String.sub str start len)
-    | Branch {leftlen; left; right} ->
-      begin
-        let actual_left_len = max (min len (leftlen - start)) 0 in
-        let actual_right_start = max (start - leftlen) 0
-        and actual_right_len = len - actual_left_len in
-        let left_sub = 
-          if start >= leftlen then
-            lf ""
-          else
-            sub_helper left start actual_left_len ~lf:lf ~br:br
-        and right_sub = 
-          if start + len < leftlen then
-            lf ""
-          else
-            sub_helper right (actual_right_start) (actual_right_len) ~lf:lf ~br:br
-        in br left_sub right_sub
-      end
-    | Sub s -> 
-      sub_helper s.rp (s.start + start) len ~lf:lf ~br:br
-
-
-let rec sub_helper_ofs r start len ofs2
-  ~(lf:string -> int -> 'a)
-  ~(br:'a ->'a -> 'a)
-  = match r with
-    | Leaf str -> 
-      lf (String.sub str start len) ofs2
-    | Branch {leftlen; left; right} ->
-      let actual_left_len = max (min len (leftlen - start)) 0 in
-      let actual_right_start = max (start - leftlen) 0
-      and actual_right_len = len - actual_left_len in
-      let left_sub = 
-        if start >= leftlen then
-          lf "" ofs2
-        else
-          sub_helper_ofs left start actual_left_len ofs2 ~lf:lf ~br:br
-      and right_sub = 
-        if start + len < leftlen then
-          lf "" ofs2
-        else
-          sub_helper_ofs right (actual_right_start) (actual_right_len) 
-            (ofs2 + actual_left_len) ~lf:lf ~br:br
-      in br left_sub right_sub
-    | Sub s -> 
-      sub_helper_ofs s.rp (s.start + start) len ofs2 ~lf:lf ~br:br
-    
-
-let of_string s = Leaf s
-
-let to_string r = 
-  let b = Bytes.create (length r) in
-  let rec to_string_rec r b ofs = match r with
-    | Leaf str -> Bytes.blit_string str 0 b ofs (String.length str)
-    | Branch {leftlen; left; right} -> 
-      to_string_rec left b ofs;
-      to_string_rec right b (ofs + leftlen)
-    | Sub {rp; start; len} -> 
-      let lf s ofs2 = Bytes.blit_string s 0 b ofs2 (String.length s)
-      and br = (fun () () -> ()) in
-      sub_helper_ofs rp start len ofs ~lf:lf ~br:br
-  in 
-  to_string_rec r b 0; b |> bts
-
-
-let make n c =
-  B.make n c |> bts |> of_string
-
-let init n f =
-  B.init n f |> bts |> of_string
-
-  
-let copy r =
-  let s = to_string r in
-  B.copy (bos s) |> bts |> of_string 
-(* deprecated, so just pure conversion *)
-
-
 let sub r ofs len = 
   if ofs < 0 || len < 0 || ofs + len > (length r) then 
     invalid_arg "Rope.sub"
@@ -118,66 +41,59 @@ let sub r ofs len =
   else
     Sub {rp = r; start = ofs; len}
 
-let get r i = 
-  String.get (to_string (sub r i 1)) 0
 
-(* deprecated *)
-let fill = 
-  B.fill
-  
-(* pure conversion might not be efficient *)  
-let blit r = 
-  to_string r |> B.blit_string
-
-    
-let rec concat sep = function
-    [] -> empty
-  | hd :: [] -> hd
-  | hd :: tl -> (hd ^ sep) ^ (concat sep tl)
-
-    
-
-let rec iter f = function
-  | Leaf str -> String.iter f str
-  | Branch b -> 
-    begin
-      iter f b.left;
-      iter f b.right
-    end
-  | Sub {rp; start; len} ->
-    let lf str =  String.iter f str
-    and br () () = () in
-    sub_helper rp start len ~lf:lf ~br:br
-
-
-
-    (* match rp with 
-    | Leaf str -> iter f (of_string (String.sub str start len))
+let rec fold
+  ~(lf:int -> int -> string -> 'a) 
+  ~(br:'a ->'a -> 'a)
+  ofs len = function
+    | Leaf str -> lf ofs len str 
     | Branch {leftlen; left; right} ->
-      let actual_left_len = max (min len (leftlen - start)) 0 in
-        if start < leftlen then
-          iter f (Sub {rp = left; start; len = actual_left_len});
-        if start + len >= leftlen then
-          let actual_start = max (start - leftlen) 0
-          and actual_right_len = len - actual_left_len in
-          iter f (Sub {rp = right; start = actual_start; len = actual_right_len})
-    | Sub r -> 
-      iter f (Sub {rp = r.rp; start = start + r.start; len}) *)
-      
+        let actual_left_ofs = min ofs leftlen
+        and actual_left_len = max (min len (leftlen - ofs)) 0 in
+        let actual_right_ofs = max (ofs - leftlen) 0
+        and actual_right_len = len - actual_left_len in
+        let left_sub = 
+          fold ~lf:lf ~br:br actual_left_ofs actual_left_len left
+        and right_sub = 
+          fold ~lf:lf ~br:br actual_right_ofs actual_right_len right
+        in br left_sub right_sub
+    | Sub s -> 
+      fold ~lf:lf ~br:br (s.start + ofs) (min len s.len)  s.rp
+    
 
-let rec iteri_rec f ofs r = 
-  let f_ofs o i c = f (i + o) c in
-  match r with
-  | Leaf str -> String.iteri (f_ofs ofs) str
-  | Branch b -> 
-    iteri_rec f ofs b.left;
-    iteri_rec f (ofs + b.leftlen) b.right
-  | Sub {rp; start; len} ->
-    let lf str ofs = String.iteri (f_ofs ofs) str
-    and br () () = () in
-    sub_helper_ofs rp start len ofs ~lf:lf ~br:br
+(* ofs is the start position of a substring
+idx is the index we need to add, i.e. the length
+of the string to the left of the current node *)
+let rec foldi
+  ~(lf:int -> int -> int -> string -> 'a)
+  ~(br:'a ->'a -> 'a)
+  ofs len idx = function 
+    | Leaf str -> lf ofs len idx str
+    | Branch {leftlen; left; right} ->
+      let actual_left_ofs = min ofs leftlen
+      and actual_left_len = max (min len (leftlen - ofs)) 0 in
+      let actual_right_ofs = max (ofs - leftlen) 0
+      and actual_right_len = len - actual_left_len in
+      let left_sub = 
+        foldi ~lf:lf ~br:br actual_left_ofs actual_left_len idx left 
+      and right_sub = foldi ~lf:lf ~br:br actual_right_ofs actual_right_len
+        (idx + actual_left_len) right
+      in br left_sub right_sub
+    | Sub s -> 
+      foldi ~lf:lf ~br:br (s.start + ofs) (min len s.len) idx s.rp
 
 
+let iter f r = 
+  let lf ofs len str = String.iter f (String.sub str ofs len)
+  and br () () = () in
+  fold ~lf:lf ~br:br 0 (length r) r
+
+
+let iteri_rec f idx r = 
+  let f_idx o i c = f (i + o) c in
+  let lf ofs len idx str = String.iteri (f_idx idx) (String.sub str ofs len)
+  and br () () = () in
+  foldi ~lf:lf ~br:br 0 (length r) idx r
 
 
     (* match rp with 
@@ -196,6 +112,123 @@ let rec iteri_rec f ofs r =
     
 let iteri f r = iteri_rec f 0 r
 
+let map f r =
+  let lf ofs len str = 
+    of_string (String.init len (fun i -> f (String.unsafe_get str (ofs + i)))) in
+  fold ~lf ~br:(^) 0 (length r) r
+
+let mapi_rec f idx r = 
+  let f_idx o i c = f (i + o) c in
+  let lf ofs len idx str = 
+    of_string (String.init len (fun i -> (f_idx idx i) (String.unsafe_get str (ofs + i))))
+  in
+  foldi ~lf ~br:(^) 0 (length r) idx r
+
+
+let mapi f r = mapi_rec f 0 r
+
+let to_string r = 
+  let b = Bytes.create (length r) in
+  let to_string_rec b idx r =
+    let lf ofs len idx str = Bytes.blit_string str ofs b idx len
+    and br () () = () in
+    foldi ~lf ~br 0 (length r) idx r
+  in 
+  to_string_rec b 0 r; b |> bts
+    
+
+
+let make n c =
+  B.make n c |> bts |> of_string
+
+let init n f =
+  B.init n f |> bts |> of_string
+
+  
+let copy r =
+  let s = to_string r in
+  B.copy (bos s) |> bts |> of_string 
+(* deprecated, so just pure conversion *)
+
+
+
+let get r i = 
+  String.get (to_string (sub r i 1)) 0
+
+(* deprecated *)
+let fill = 
+  B.fill
+  
+(* pure conversion might not be efficient *)  
+let blit r = 
+  to_string r |> B.blit_string
+
+    
+let rec concat sep = function
+    [] -> empty
+  | hd :: [] -> hd
+  | hd :: tl -> (hd ^ sep) ^ (concat sep tl)
+
+
+(* let rec iter f = function
+  | Leaf str -> String.iter f str
+  | Branch b -> 
+    begin
+      iter f b.left;
+      iter f b.right
+    end
+  | Sub {rp; start; len} ->
+    let lf str =  String.iter f str
+    and br () () = () in
+    sub_helper rp start len ~lf:lf ~br:br *)
+
+
+
+    (* match rp with 
+    | Leaf str -> iter f (of_string (String.sub str start len))
+    | Branch {leftlen; left; right} ->
+      let actual_left_len = max (min len (leftlen - start)) 0 in
+        if start < leftlen then
+          iter f (Sub {rp = left; start; len = actual_left_len});
+        if start + len >= leftlen then
+          let actual_start = max (start - leftlen) 0
+          and actual_right_len = len - actual_left_len in
+          iter f (Sub {rp = right; start = actual_start; len = actual_right_len})
+    | Sub r -> 
+      iter f (Sub {rp = r.rp; start = start + r.start; len}) *)
+      
+
+(* let rec iteri_rec f ofs r = 
+  let f_ofs o i c = f (i + o) c in
+  match r with
+  | Leaf str -> String.iteri (f_ofs ofs) str
+  | Branch b -> 
+    iteri_rec f ofs b.left;
+    iteri_rec f (ofs + b.leftlen) b.right
+  | Sub {rp; start; len} ->
+    let lf str ofs = String.iteri (f_ofs ofs) str
+    and br () () = () in
+    sub_helper_ofs rp start len ofs ~lf:lf ~br:br *)
+
+
+
+
+    (* match rp with 
+    | Leaf str -> iteri_rec f ofs (of_string (String.sub str start len))
+    | Branch {leftlen; left; right} ->
+      let actual_left_len = max (min len (leftlen - start)) 0 in
+        if start < leftlen then
+          iteri_rec f ofs (Sub {rp = left; start; len = actual_left_len});
+        if start + len >= leftlen then
+          let actual_start = max (start - leftlen) 0
+          and actual_right_len = len - actual_left_len in
+          iteri_rec f (ofs + actual_left_len) (Sub {rp = right; start = actual_start; len = actual_right_len})
+    | Sub r -> 
+      iteri_rec f ofs (Sub {rp = r.rp; start = start + r.start; len}) *)
+
+    
+(* let iteri f r = iteri_rec f 0 r
+
 let rec map f = function
   | Leaf str -> Leaf (String.map f str)
   | Branch b ->
@@ -205,174 +238,116 @@ let rec map f = function
     let lf str = Leaf (String.map f str)
     and br = (^) in
     sub_helper rp start len ~lf:lf ~br:br
+   *)
 
 
-let rec mapi_rec f ofs r = 
-  let f_ofs o i c = f (i + o) c in
-  match r with
-    | Leaf str -> Leaf (String.mapi (f_ofs ofs) str)
-    | Branch b ->
-      let left = mapi_rec f ofs b.left 
-      and right = mapi_rec f (ofs + b.leftlen) b.right in
-      left ^ right
-    | Sub {rp; start; len} ->
-      let lf str ofs2 = Leaf (String.mapi (f_ofs ofs2) str)
-      and br = (^) in
-      sub_helper_ofs rp start len ofs ~lf:lf ~br:br
-  
 
-let mapi f r = mapi_rec f 0 r
 
 let is_space = function
   | ' ' | '\012' | '\n' | '\r' | '\t' -> true
   | _ -> false
 
-let rec trim_left = function
-  | Leaf str -> 
-    let i = ref 0 and len = String.length str in 
-    while !i < len && is_space (String.unsafe_get str !i) do incr i done;
-    if !i = len then empty else Leaf (String.sub str !i (len - !i))
-  | Branch b ->
-    let l_trimmed = trim_left b.left in
-    if is_empty l_trimmed then
-      trim_left b.right
-    else
-      l_trimmed ^ b.right
-  | Sub {rp; start; len} ->
-    match rp with 
-    | Leaf str -> trim_left (of_string (String.sub str start len))
+let rec fold_left 
+  ~(lf:int -> int -> string -> 'a)
+  ~(br:'a -> 'a -> 'a)
+  ~(p: 'a -> bool)
+  ofs len = function
+    | Leaf str -> lf ofs len str
     | Branch {leftlen; left; right} ->
-      let actual_left_len = max (min len (leftlen - start)) 0 in
-      let actual_right_start = max (start - leftlen) 0
+      let actual_left_ofs = min ofs leftlen
+      and actual_left_len = max (min len (leftlen - ofs)) 0 in
+      let actual_right_ofs = max (ofs - leftlen) 0
       and actual_right_len = len - actual_left_len in
-      if start < leftlen && start + len >= leftlen then(
-        let l_trimmed = 
-          trim_left (Sub {rp = left; start; len = actual_left_len}) in
-        if is_empty l_trimmed then(
-          if start + len >= leftlen then
-            l_trimmed ^
-              (trim_left 
-                (Sub {rp = right; start = actual_right_start; len = actual_right_len}))
-          else
-            empty
-        )
-        else
-          l_trimmed ^ (Sub {rp = right; start = actual_right_start; len = actual_right_len})
-      )
-      else if start + len < leftlen then 
-        trim_left (Sub {rp = left; start; len = actual_left_len})
+      let left_sub = 
+        fold_left ~lf ~br ~p actual_left_ofs actual_left_len left
+      in 
+      if p left_sub then
+        fold_left ~lf ~br ~p actual_right_ofs actual_right_len right
       else
-        trim_left (Sub {rp = right; start = start - leftlen; len}) 
-    | Sub r -> 
-      trim_left (Sub {rp = r.rp; start = start + r.start; len})
+        br left_sub right
+    | Sub s -> 
+      fold_left ~lf ~br ~p (s.start + ofs) (min len s.len) s.rp
     
-let rec trim_right = function
-    | Leaf str ->
-      let len = String.length str in 
-      let i = ref (len - 1) in
-      while !i >= 0 && is_space (String.unsafe_get str !i) do decr i done;
-      if !i < 0 then empty else Leaf (String.sub str 0 (!i + 1))
-    | Branch b ->
-      let r_trimmed = trim_right b.right in
-      if is_empty r_trimmed then 
-        trim_right b.left
+let rec fold_right 
+  ~(lf:int -> int -> string -> 'a)
+  ~(br:'a -> 'a -> 'a)
+  ~(p: 'a -> bool)
+  ofs len = function
+    | Leaf str -> lf ofs len str
+    | Branch {leftlen; left; right} ->
+      let actual_left_ofs = min ofs leftlen
+      and actual_left_len = max (min len (leftlen - ofs)) 0 in
+      let actual_right_ofs = max (ofs - leftlen) 0
+      and actual_right_len = len - actual_left_len in
+      let right_sub = 
+        fold_right ~lf ~br ~p actual_right_ofs actual_right_len right
+      in 
+      if p right_sub then
+        fold_right ~lf ~br ~p actual_left_ofs actual_left_len left
       else
-        b.left ^ r_trimmed
-    | Sub {rp; start; len} ->
-      match rp with 
-      | Leaf str -> trim_right (of_string (String.sub str start len))
-      | Branch {leftlen; left; right} ->
-        let actual_left_len = max (min len (leftlen - start)) 0 in
-        let actual_right_start = max (start - leftlen) 0
-        and actual_right_len = len - actual_left_len in
-        if start + len >= leftlen && start < leftlen then(
-          let r_trimmed = 
-            trim_right (Sub {rp = right; start = actual_right_start; len = actual_right_len}) in
-            if is_empty r_trimmed then(
-              if start < leftlen then(
-                (trim_right (Sub {rp = left; start; len = actual_left_len}))
-                  ^ r_trimmed 
-              )
-              else
-                empty
-            )
-            else
-              (Sub {rp = left; start = start; len = actual_left_len}) ^ r_trimmed
-        )
-        else if start + len >= leftlen then
-          trim_right (Sub {rp = right; start = actual_right_start; len = actual_right_len})
-        else
-          trim_right (Sub {rp = left; start; len = actual_left_len}) 
-        
-      | Sub r -> 
-        trim_right (Sub {rp = r.rp; start = start + r.start; len})
+        br left right_sub
+    | Sub s -> 
+      fold_left ~lf ~br ~p (s.start + ofs) (min len s.len) s.rp
+    
+
+
+let trim_left r = 
+  let lf ofs len str = 
+    let i = ref 0 in
+    while !i < len && is_space (String.unsafe_get str (!i + ofs)) do incr i done;
+    if !i = len then 
+      empty 
+    else
+      of_string (String.sub str (!i + ofs) (len - !i))
+  in fold_left ~lf ~br:(^) ~p:is_empty 0 (length r) r
+
+    
+let trim_right r = 
+  let lf ofs len str = 
+    let i = ref (len - 1) in
+    while !i >= 0 && is_space (String.unsafe_get str (!i + ofs)) do decr i done;
+    if !i < 0 then 
+      empty 
+    else 
+      of_string (String.sub str ofs (!i + 1))
+  in fold_right ~lf ~br:(^) ~p:is_empty 0 (length r) r
       
 let trim r = trim_left (trim_right r)
 
-let rec escaped = function
-  | Leaf str -> Leaf (String.escaped str)
-  | Branch b ->
-    let left = escaped b.left and 
-    right = escaped b.right in 
-    left ^ right
-  | Sub {rp; start; len} ->
-    let lf str = Leaf (String.escaped str)
-    and br = (^) in
-    sub_helper rp start len ~lf:lf ~br:br
+let escaped r= 
+  let lf len ofs str = 
+    of_string (String.escaped (String.sub str len ofs))
+  in fold ~lf ~br:(^) 0 (length r) r
 
 
-(* ofs is the length of the string we have already discarded,
-i is the from-index *)
-let rec index_from_rec r ofs i c = match r with 
-  | Leaf str -> (String.index_from str i c) + ofs
-  | Branch {leftlen; left; right} ->
-    if i >= leftlen then
-      index_from_rec right (ofs + leftlen) (i - leftlen) c 
-    else
-      begin
-        try 
-          index_from_rec left ofs i c
-        with  
-          Not_found -> index_from_rec right (ofs + leftlen) 0 c
-      end
-  | Sub {rp; start; len} -> 
-    match rp with
-    | Leaf str -> index_from_rec (of_string (String.sub str start len)) ofs i c
+(* fi is the from index for each node
+unfortunately this implementation is still quite complicated
+and I could not find a way to simplify it *)
+let rec index_from_helper
+  ~(lf:int -> int -> int -> int -> string -> 'a)
+  ofs len idx fi = function
+    | Leaf str -> lf ofs len idx fi str
     | Branch {leftlen; left; right} ->
-      let actual_left_len = max (min len (leftlen - start)) 0 in
-      let actual_right_start = max (start - leftlen) 0
+      let actual_left_ofs = min ofs leftlen
+      and actual_left_len = max (min len (leftlen - ofs)) 0 in
+      let actual_right_ofs = max (ofs - leftlen) 0
       and actual_right_len = len - actual_left_len in
-      if start < leftlen && start + len >= leftlen then(
-        if i >= actual_left_len then(
-          index_from_rec 
-            (Sub {rp = right; start = actual_right_start; len = actual_right_len})
-            (ofs + actual_left_len) (i - actual_left_len) c 
-        )
-        else(
-          try 
-            index_from_rec 
-              (Sub {rp = left; start; len = actual_left_len})
-              ofs i c
-          with  
-            Not_found -> 
-              index_from_rec 
-                (Sub {rp = right; start = actual_right_start; len = actual_right_len})
-                (ofs + actual_left_len) 0 c
-        )
+      let actual_left_fi = min fi actual_left_len
+      and actual_right_fi = max (fi - actual_left_len) 0 in
+      (
+      try
+        index_from_helper ~lf actual_left_ofs actual_left_len idx actual_left_fi left
+      with Not_found -> 
+        index_from_helper ~lf actual_right_ofs actual_right_len (idx + actual_left_len) actual_right_fi right
       )
-      else if start < leftlen then(
-        index_from_rec 
-          (Sub {rp = left; start; len = actual_left_len})
-          ofs i c
-      )
-      else(
-        index_from_rec 
-          (Sub {rp = right; start = actual_right_start; len = actual_right_len})
-          (ofs + actual_left_len) (i - actual_left_len) c 
-      )
-    | Sub r -> 
-      index_from_rec 
-        (Sub {rp = r.rp; start = start + r.start; len}) ofs i c
+    | Sub s -> 
+      index_from_helper ~lf (s.start + ofs) (min len s.len) idx fi s.rp
+    
+let index_from_rec r idx fi c = 
+  let lf ofs len idx fi str = 
+    (String.index_from (String.sub str ofs len) fi c) + idx
+  in index_from_helper ~lf 0 (length r) idx fi r
+
     
 let index_rec r i c = index_from_rec r 0 i c
 
@@ -399,56 +374,30 @@ let index_from_opt r i c =
       Not_found -> None
 
 
-let rec rindex_from_rec r ofs i c = match r with 
-  | Leaf str -> (String.rindex_from str i c) + ofs
-  | Branch {leftlen; left; right} ->
-    if i < leftlen then
-      rindex_from_rec left ofs i c
-    else
-      begin
-        try
-          rindex_from_rec right (leftlen + ofs) (i - leftlen) c 
-        with 
-          Not_found -> rindex_from_rec left ofs (leftlen - 1) c
-      end
-  | Sub {rp; start; len} -> 
-    match rp with
-    | Leaf str -> rindex_from_rec (of_string (String.sub str start len)) ofs i c
+let rec rindex_from_helper
+  ~(lf:int -> int -> int -> int -> string -> 'a)
+  ofs len idx fi = function
+    | Leaf str -> lf ofs len idx fi str
     | Branch {leftlen; left; right} ->
-      let actual_left_len = max (min len (leftlen - start)) 0 in
-      let actual_right_start = max (start - leftlen) 0
+      let actual_left_ofs = min ofs leftlen
+      and actual_left_len = max (min len (leftlen - ofs)) 0 in
+      let actual_right_ofs = max (ofs - leftlen) 0
       and actual_right_len = len - actual_left_len in
-      if start + len >= leftlen && start < leftlen then(
-        if i < actual_left_len then(
-          rindex_from_rec 
-            (Sub {rp = left; start; len = actual_left_len})
-            ofs i c
-        )
-        else(
-          try 
-            rindex_from_rec 
-              (Sub {rp = right; start = actual_right_start; len = actual_right_len})
-              (actual_left_len + ofs) (i - actual_left_len) c 
-          with  
-            Not_found -> 
-              rindex_from_rec 
-                (Sub {rp = left; start; len = actual_left_len})
-                ofs (actual_left_len - 1) c
-        )
+      let actual_left_fi = min fi actual_left_len
+      and actual_right_fi = max (fi - actual_left_len) 0 in
+      (
+      try
+        rindex_from_helper ~lf actual_right_ofs actual_right_len (idx + actual_left_len) actual_right_fi right
+      with Not_found -> 
+        rindex_from_helper ~lf actual_left_ofs actual_left_len idx actual_left_fi left
       )
-      else if start + len >= leftlen then(
-        rindex_from_rec 
-          (Sub {rp = right; start = actual_right_start; len = actual_right_len})
-          (actual_left_len + ofs) (i - actual_left_len) c 
-      )
-      else(
-        rindex_from_rec 
-          (Sub {rp = left; start; len = actual_left_len})
-          ofs i c
-      )
-    | Sub r -> 
-      rindex_from_rec 
-          (Sub {rp = r.rp; start = start + r.start; len}) ofs i c
+    | Sub s -> 
+      rindex_from_helper ~lf (s.start + ofs) (min len s.len) idx fi s.rp
+
+let rindex_from_rec r idx fi c = 
+  let lf ofs len idx fi str = 
+    (String.rindex_from (String.sub str ofs len) fi c) + idx
+  in rindex_from_helper ~lf 0 (length r) idx fi r
 
 let rindex_from r i c =
   if i < -1 || i >= length r then
@@ -490,64 +439,15 @@ let uppercase_ascii r = map Char.uppercase_ascii r
 
 let lowercase_ascii r = map Char.lowercase_ascii r
 
-let rec capitalize_ascii = function
-  | Leaf str -> Leaf (String.capitalize_ascii str)
-  | Branch {leftlen; left; right} ->
-    if leftlen <> 0 then
-      (capitalize_ascii left) ^ right
-    else
-      capitalize_ascii right
-   | Sub {rp; start; len} ->
-      match rp with 
-      | Leaf str -> capitalize_ascii (of_string (String.sub str start len))
-      | Branch {leftlen; left; right} ->
-        let actual_left_len = max (min len (leftlen - start)) 0 in
-        let actual_right_start = max (start - leftlen) 0
-        and actual_right_len = len - actual_left_len in
-        if start < leftlen && start + len >= leftlen then(
-          if actual_left_len <> 0 then
-            (capitalize_ascii (Sub {rp = left; start; len = actual_left_len})) ^ right
-          else
-            capitalize_ascii (Sub {rp = right; start = actual_right_start; len = actual_right_len})
-        )
-        else if start < leftlen then(
-          capitalize_ascii (Sub {rp = left; start; len = actual_left_len})
-        )
-        else(
-          capitalize_ascii (Sub {rp = right; start = actual_right_start; len = actual_right_len})
-        )
-      | Sub r -> 
-        capitalize_ascii (Sub {rp = r.rp; start = start + r.start; len})
+let capitalize_ascii r = 
+  let lf ofs len str = of_string (String.capitalize_ascii (String.sub str ofs len))
+  in fold_left ~lf ~br:(^) ~p:is_empty 0 (length r) r
+
       
-let rec uncapitalize_ascii = function
-  | Leaf str -> Leaf (String.uncapitalize_ascii str)
-  | Branch {leftlen; left; right} ->
-    if leftlen <> 0 then
-      (uncapitalize_ascii left) ^ right
-    else
-      uncapitalize_ascii right
-   | Sub {rp; start; len} ->
-      match rp with 
-      | Leaf str -> uncapitalize_ascii (of_string (String.sub str start len))
-      | Branch {leftlen; left; right} ->
-        let actual_left_len = max (min len (leftlen - start)) 0 in
-        let actual_right_start = max (start - leftlen) 0
-        and actual_right_len = len - actual_left_len in
-        if start < leftlen then(
-          if actual_left_len <> 0 then
-            (uncapitalize_ascii (Sub {rp = left; start; len = actual_left_len})) ^ right
-          else
-            uncapitalize_ascii (Sub {rp = right; start = actual_right_start; len = actual_right_len})
-        )
-        else if start < leftlen then(
-          uncapitalize_ascii (Sub {rp = left; start; len = actual_left_len})
-        )
-        else(
-          uncapitalize_ascii (Sub {rp = right; start = actual_right_start; len = actual_right_len})
-        )
-      | Sub r -> 
-        uncapitalize_ascii (Sub {rp = r.rp; start = start + r.start; len})
-    
+let uncapitalize_ascii r =
+  let lf ofs len str = of_string (String.uncapitalize_ascii (String.sub str ofs len))
+  in fold_left ~lf ~br:(^) ~p:is_empty 0 (length r) r
+
 
 exception Out_of_bounds of string;;
 
@@ -687,14 +587,10 @@ let compare (x: t) (y: t) =
 
 let equal x y = (compare x y) = 0
 
-let rec split_on_char sep = function
-    | Leaf str -> List.map of_string (String.split_on_char sep str)
-    | Branch b ->
-      (split_on_char sep b.left) @ (split_on_char sep b.right)
-    | Sub {rp; start; len} ->
-      let lf str = List.map of_string (String.split_on_char sep str)
-      and br = (@) in
-      sub_helper rp start len ~lf:lf ~br:br
+let split_on_char sep r = 
+  let lf ofs len str = 
+    List.map of_string (String.split_on_char sep (String.sub str ofs len))
+  in fold ~lf ~br:(@) 0 (length r) r
 
 (* Deprecated functions implemented via other deprecated functions *)
 [@@@ocaml.warning "-3"]
