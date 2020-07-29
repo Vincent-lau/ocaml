@@ -40,7 +40,7 @@ let destruct (r : t)
     lf (Obj.obj rt_r) 
   else 
   begin
-    assert (Obj.tag rt_r = Obj.promote_tag);
+    assert (Obj.tag rt_r = Obj.forward_tag);
     br ~leftlen:(Obj.obj (Obj.repr (Obj.field rt_r 1)) : int)
       ~left:(Obj.obj (Obj.repr (Obj.field rt_r 2)) : t)
       ~right:(Obj.obj (Obj.repr (Obj.field rt_r 3)) : t)
