@@ -261,7 +261,7 @@ CAMLextern value caml_get_public_method (value obj, value tag);
 CAMLextern value caml_hash_variant(char const * tag);
 
 /* Promotions. */ 
-#define Promote_tag 245
+// #define Promote_tag 245
 
 /* 2- If tag >= No_scan_tag : a sequence of bytes. */
 

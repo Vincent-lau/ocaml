@@ -201,19 +201,7 @@ void caml_oldify_one (value v, value *p)
       *p = Field (v, 0);  /*  then forward pointer is first field. */
     }else{
       tag = Tag_hd (hd);
-      if (tag == Promote_tag){
-        typedef value (promote_fun)(value, value *, header_t);
-        promote_fun *promoter;
-        promoter = (promote_fun *) (Long_val(Field(v, 0)));
-        result = (*promoter)(v, p, hd);
-        // I left the forwarding process here
-        // could move them into caml_oldify rope
-        // although the signature of the promote_fun
-        // would be slightly different
-        Hd_val(v) = 0;            /* Set forward flag */
-        Field (v, 0) = result;     /*  and forward pointer. */
-        *p = result;
-      }else if (tag < Infix_tag){
+      if (tag < Infix_tag){
         value field0;
 
         sz = Wosize_hd (hd);
@@ -244,39 +232,55 @@ void caml_oldify_one (value v, value *p)
         caml_oldify_one (v - offset, p);   /* Cannot recurse deeper than 1. */
         *p += offset;
       }else{
-        value f = Forward_val (v);
-        tag_t ft = 0;
-        int vv = 1;
-
         CAMLassert (tag == Forward_tag);
-        if (Is_block (f)){
-          if (Is_young (f)){
-            vv = 1;
-            ft = Tag_val (Hd_val (f) == 0 ? Field (f, 0) : f);
-          }else{
-            vv = Is_in_value_area(f);
-            if (vv){
-              ft = Tag_val (f);
+        if (Wosize_hd(hd) > 1){
+          typedef value (promote_fun)(value, value *, header_t);
+          promote_fun *promoter;
+          promoter = (promote_fun *) (Long_val(Field(v, 0)));
+          result = (*promoter)(v, p, hd);
+          // I left the forwarding process here
+          // could move them into caml_oldify rope
+          // although the signature of the promote_fun
+          // would be slightly different
+          Hd_val(v) = 0;            /* Set forward flag */
+          Field (v, 0) = result;     /*  and forward pointer. */
+          *p = result;
+        }
+        else{
+          value f = Forward_val (v);
+          tag_t ft = 0;
+          int vv = 1;
+
+          
+          if (Is_block (f)){
+            if (Is_young (f)){
+              vv = 1;
+              ft = Tag_val (Hd_val (f) == 0 ? Field (f, 0) : f);
+            }else{
+              vv = Is_in_value_area(f);
+              if (vv){
+                ft = Tag_val (f);
+              }
             }
           }
-        }
-        if (!vv || ft == Forward_tag || ft == Lazy_tag
+          if (!vv || ft == Forward_tag || ft == Lazy_tag
 #ifdef FLAT_FLOAT_ARRAY
-            || ft == Double_tag
+              || ft == Double_tag
 #endif
-            ){
-          /* Do not short-circuit the pointer.  Copy as a normal block. */
-          CAMLassert (Wosize_hd (hd) == 1);
-          result = caml_alloc_shr_for_minor_gc (1, Forward_tag, hd);
-          *p = result;
-          Hd_val (v) = 0;             /* Set (GC) forward flag */
-          Field (v, 0) = result;      /*  and forward pointer. */
-          p = &Field (result, 0);
-          v = f;
-          goto tail_call;
-        }else{
-          v = f;                        /* Follow the forwarding */
-          goto tail_call;               /*  then oldify. */
+              ){
+            /* Do not short-circuit the pointer.  Copy as a normal block. */
+            CAMLassert (Wosize_hd (hd) == 1);
+            result = caml_alloc_shr_for_minor_gc (1, Forward_tag, hd);
+            *p = result;
+            Hd_val (v) = 0;             /* Set (GC) forward flag */
+            Field (v, 0) = result;      /*  and forward pointer. */
+            p = &Field (result, 0);
+            v = f;
+            goto tail_call;
+          }else{
+            v = f;                        /* Follow the forwarding */
+            goto tail_call;               /*  then oldify. */
+          }
         }
       }
     }

@@ -72,7 +72,6 @@ external with_tag : int -> t -> t = "caml_obj_with_tag"
 val first_non_constant_constructor_tag : int
 val last_non_constant_constructor_tag : int
 
-val promote_tag : int
 val lazy_tag : int
 val closure_tag : int
 val object_tag : int
