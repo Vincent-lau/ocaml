@@ -88,4 +88,6 @@ STDLIB_MODULES=\
   $(P)ropeBuffer \
   $(P)compactRopeBuffer \
   $(P)subRope \
-  $(P)compactSubRope
+  $(P)compactSubRope \
+  $(P)subRopeBuffer \
+  $(P)compactSubRopeBuffer

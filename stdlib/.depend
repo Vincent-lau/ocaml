@@ -214,7 +214,6 @@ stdlib__compactSubRope.cmo : \
     stdlib__obj.cmi \
     stdlib__list.cmi \
     stdlib__char.cmi \
-    stdlib__callback.cmi \
     stdlib__bytes.cmi \
     stdlib__compactSubRope.cmi
 stdlib__compactSubRope.cmx : \
@@ -223,10 +222,30 @@ stdlib__compactSubRope.cmx : \
     stdlib__obj.cmx \
     stdlib__list.cmx \
     stdlib__char.cmx \
-    stdlib__callback.cmx \
     stdlib__bytes.cmx \
     stdlib__compactSubRope.cmi
 stdlib__compactSubRope.cmi :
+stdlib__compactSubRopeBuffer.cmo : \
+    stdlib__uchar.cmi \
+    stdlib__sys.cmi \
+    stdlib__string.cmi \
+    stdlib__seq.cmi \
+    stdlib__compactSubRope.cmi \
+    stdlib__char.cmi \
+    stdlib__bytes.cmi \
+    stdlib__compactSubRopeBuffer.cmi
+stdlib__compactSubRopeBuffer.cmx : \
+    stdlib__uchar.cmx \
+    stdlib__sys.cmx \
+    stdlib__string.cmx \
+    stdlib__seq.cmx \
+    stdlib__compactSubRope.cmx \
+    stdlib__char.cmx \
+    stdlib__bytes.cmx \
+    stdlib__compactSubRopeBuffer.cmi
+stdlib__compactSubRopeBuffer.cmi : \
+    stdlib__uchar.cmi \
+    stdlib__seq.cmi
 stdlib__complex.cmo : \
     stdlib__complex.cmi
 stdlib__complex.cmx : \
@@ -750,6 +769,27 @@ stdlib__subRope.cmx : \
     stdlib__bytes.cmx \
     stdlib__subRope.cmi
 stdlib__subRope.cmi :
+stdlib__subRopeBuffer.cmo : \
+    stdlib__uchar.cmi \
+    stdlib__sys.cmi \
+    stdlib__subRope.cmi \
+    stdlib__string.cmi \
+    stdlib__seq.cmi \
+    stdlib__char.cmi \
+    stdlib__bytes.cmi \
+    stdlib__subRopeBuffer.cmi
+stdlib__subRopeBuffer.cmx : \
+    stdlib__uchar.cmx \
+    stdlib__sys.cmx \
+    stdlib__subRope.cmx \
+    stdlib__string.cmx \
+    stdlib__seq.cmx \
+    stdlib__char.cmx \
+    stdlib__bytes.cmx \
+    stdlib__subRopeBuffer.cmi
+stdlib__subRopeBuffer.cmi : \
+    stdlib__uchar.cmi \
+    stdlib__seq.cmi
 stdlib__sys.cmo : \
     stdlib__sys.cmi
 stdlib__sys.cmx : \
