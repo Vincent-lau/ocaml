@@ -506,37 +506,50 @@ CAMLprim value caml_ml_rope_length(value r){
     return Val_long(caml_rope_length(r));   
 }
 
-CAMLprim value caml_rope_to_string_rec(value r, value b, value ofs)
+static inline mlsize_t min(long x, long y){
+  return x < y? x : y;
+}
+
+static inline mlsize_t max(long x, long y){
+  return x > y? x : y;
+}
+
+CAMLprim value caml_rope_to_string_rec(value r, value b, 
+  mlsize_t ofs, mlsize_t len, mlsize_t idx)
 {
   if (Tag_val(r) == String_tag){
-      caml_blit_bytes(r, Val_int(0), b, ofs, caml_ml_string_length(r));           
+    caml_blit_bytes(r, Val_long(ofs), b, Val_long(idx), Val_long(len));           
   }
   else{
     CAMLassert(Tag_val(r) == Forward_tag);
     value field1 = Field(r, 1);
     if (Is_long(field1)){
-      value leftlen, left, right;
-      leftlen = Field(r, 1);
+      value left, right;
+      mlsize_t leftlen;
+      mlsize_t actual_left_ofs, actual_left_len, actual_right_ofs, actual_right_len;
+      leftlen = Unsigned_long_val(Field(r, 1));
       left = Field(r, 2);
       right = Field(r, 3);
-      caml_rope_to_string_rec(left, b, ofs);
-      caml_rope_to_string_rec(right, b, Val_long(Long_val(leftlen) + Long_val(ofs)));
+
+      actual_left_ofs = min(ofs, leftlen);
+      actual_left_len = max(min(len, leftlen - ofs), 0);
+      actual_right_ofs = max(ofs - leftlen, 0);
+      actual_right_len = len - actual_left_len;      
+
+      caml_rope_to_string_rec(left, b, actual_left_ofs, actual_left_len, idx);
+      caml_rope_to_string_rec(right, b, actual_right_ofs, actual_right_len, 
+        idx + actual_left_len);
     }
     else{
       // this is a sub
-      static const value * compactRope_sub_copy;
-      value rp, start, len, sub_rp;
-      rp = Field(r, 1);
-      start = Field(r, 2);
-      len = Field(r, 3);
-      compactRope_sub_copy = NULL;
+      value rp;
+      mlsize_t rp_start, rp_len;
       CAMLassert (Tag_val(field1) == Forward_tag);
-
-      if (compactRope_sub_copy == NULL) {
-          compactRope_sub_copy = caml_named_value("compactRope sub_copy");
-      }
-      sub_rp = caml_callback3(*compactRope_sub_copy, rp, start, len);
-      caml_rope_to_string_rec(sub_rp, b, ofs);
+      rp = Field(r, 1);
+      rp_start = Unsigned_long_val(Field(r, 2));
+      rp_len = Unsigned_long_val(Field(r, 3));
+      
+      caml_rope_to_string_rec(rp, b, rp_start + ofs, min(len, rp_len), idx);
     }
   }
   return Val_unit;
@@ -548,7 +561,7 @@ CAMLprim value caml_rope_to_string(value r)
   CAMLlocal2(b, len);
   len = caml_ml_rope_length(r);
   b = caml_create_bytes(len);
-  caml_rope_to_string_rec(r, b, Val_int(0));
+  caml_rope_to_string_rec(r, b, 0, len, 0);
   CAMLreturn(b);
 }
 
@@ -575,15 +588,6 @@ CAMLprim value caml_rope_sub_cons(value rp, value start, value len){
   Field(b, 2) = start;
   Field(b, 3) = len;
   CAMLreturn(b);
-}
-
-
-static inline mlsize_t min(long x, long y){
-  return x < y? x : y;
-}
-
-static inline mlsize_t max(long x, long y){
-  return x > y? x : y;
 }
 
 // ofs is the start position a particular node

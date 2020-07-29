@@ -111,9 +111,6 @@ let sub_copy r ofs len =
           ~sub: (fun ~rp ~rp_start ~rp_len -> sub_rec rp rp_start rp_len)
     in sub_rec r ofs len
 
-(* need to register this sub_copy to be used in C
-or could write this in C directly *)
-let _ = Callback.register "compactRope sub_copy" sub_copy
 
 let sub r ofs len = 
   if ofs < 0 || len < 0 || ofs + len > (length r) then 

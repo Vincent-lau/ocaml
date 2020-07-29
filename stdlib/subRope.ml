@@ -52,12 +52,12 @@ let rec fold
         let actual_right_ofs = max (ofs - leftlen) 0
         and actual_right_len = len - actual_left_len in
         let left_sub = 
-          fold ~lf:lf ~br:br actual_left_ofs actual_left_len left
+          fold ~lf ~br actual_left_ofs actual_left_len left
         and right_sub = 
-          fold ~lf:lf ~br:br actual_right_ofs actual_right_len right
+          fold ~lf ~br actual_right_ofs actual_right_len right
         in br left_sub right_sub
     | Sub s -> 
-      fold ~lf:lf ~br:br (s.start + ofs) (min len s.len)  s.rp
+      fold ~lf ~br (s.start + ofs) (min len s.len)  s.rp
     
 
 (* ofs is the start position of a substring
@@ -74,12 +74,12 @@ let rec foldi
       let actual_right_ofs = max (ofs - leftlen) 0
       and actual_right_len = len - actual_left_len in
       let left_sub = 
-        foldi ~lf:lf ~br:br actual_left_ofs actual_left_len idx left 
-      and right_sub = foldi ~lf:lf ~br:br actual_right_ofs actual_right_len
+        foldi ~lf ~br actual_left_ofs actual_left_len idx left 
+      and right_sub = foldi ~lf ~br actual_right_ofs actual_right_len
         (idx + actual_left_len) right
       in br left_sub right_sub
     | Sub s -> 
-      foldi ~lf:lf ~br:br (s.start + ofs) (min len s.len) idx s.rp
+      foldi ~lf ~br (s.start + ofs) (min len s.len) idx s.rp
 
 
 let iter f r = 
@@ -92,7 +92,7 @@ let iteri_rec f idx r =
   let f_idx o i c = f (i + o) c in
   let lf ofs len idx str = String.iteri (f_idx idx) (String.sub str ofs len)
   and br () () = () in
-  foldi ~lf:lf ~br:br 0 (length r) idx r
+  foldi ~lf ~br 0 (length r) idx r
 
     
 let iteri f r = iteri_rec f 0 r
