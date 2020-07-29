@@ -1,4 +1,3 @@
-
 module B = Bytes
 
 type t = Leaf of string 
@@ -95,20 +94,6 @@ let iteri_rec f idx r =
   and br () () = () in
   foldi ~lf:lf ~br:br 0 (length r) idx r
 
-
-    (* match rp with 
-    | Leaf str -> iteri_rec f ofs (of_string (String.sub str start len))
-    | Branch {leftlen; left; right} ->
-      let actual_left_len = max (min len (leftlen - start)) 0 in
-        if start < leftlen then
-          iteri_rec f ofs (Sub {rp = left; start; len = actual_left_len});
-        if start + len >= leftlen then
-          let actual_start = max (start - leftlen) 0
-          and actual_right_len = len - actual_left_len in
-          iteri_rec f (ofs + actual_left_len) (Sub {rp = right; start = actual_start; len = actual_right_len})
-    | Sub r -> 
-      iteri_rec f ofs (Sub {rp = r.rp; start = start + r.start; len}) *)
-
     
 let iteri f r = iteri_rec f 0 r
 
@@ -170,78 +155,6 @@ let rec concat sep = function
   | hd :: tl -> (hd ^ sep) ^ (concat sep tl)
 
 
-(* let rec iter f = function
-  | Leaf str -> String.iter f str
-  | Branch b -> 
-    begin
-      iter f b.left;
-      iter f b.right
-    end
-  | Sub {rp; start; len} ->
-    let lf str =  String.iter f str
-    and br () () = () in
-    sub_helper rp start len ~lf:lf ~br:br *)
-
-
-
-    (* match rp with 
-    | Leaf str -> iter f (of_string (String.sub str start len))
-    | Branch {leftlen; left; right} ->
-      let actual_left_len = max (min len (leftlen - start)) 0 in
-        if start < leftlen then
-          iter f (Sub {rp = left; start; len = actual_left_len});
-        if start + len >= leftlen then
-          let actual_start = max (start - leftlen) 0
-          and actual_right_len = len - actual_left_len in
-          iter f (Sub {rp = right; start = actual_start; len = actual_right_len})
-    | Sub r -> 
-      iter f (Sub {rp = r.rp; start = start + r.start; len}) *)
-      
-
-(* let rec iteri_rec f ofs r = 
-  let f_ofs o i c = f (i + o) c in
-  match r with
-  | Leaf str -> String.iteri (f_ofs ofs) str
-  | Branch b -> 
-    iteri_rec f ofs b.left;
-    iteri_rec f (ofs + b.leftlen) b.right
-  | Sub {rp; start; len} ->
-    let lf str ofs = String.iteri (f_ofs ofs) str
-    and br () () = () in
-    sub_helper_ofs rp start len ofs ~lf:lf ~br:br *)
-
-
-
-
-    (* match rp with 
-    | Leaf str -> iteri_rec f ofs (of_string (String.sub str start len))
-    | Branch {leftlen; left; right} ->
-      let actual_left_len = max (min len (leftlen - start)) 0 in
-        if start < leftlen then
-          iteri_rec f ofs (Sub {rp = left; start; len = actual_left_len});
-        if start + len >= leftlen then
-          let actual_start = max (start - leftlen) 0
-          and actual_right_len = len - actual_left_len in
-          iteri_rec f (ofs + actual_left_len) (Sub {rp = right; start = actual_start; len = actual_right_len})
-    | Sub r -> 
-      iteri_rec f ofs (Sub {rp = r.rp; start = start + r.start; len}) *)
-
-    
-(* let iteri f r = iteri_rec f 0 r
-
-let rec map f = function
-  | Leaf str -> Leaf (String.map f str)
-  | Branch b ->
-    let left = map f b.left and right = map f b.right 
-    in left ^ right
-  | Sub {rp; start; len} ->
-    let lf str = Leaf (String.map f str)
-    and br = (^) in
-    sub_helper rp start len ~lf:lf ~br:br
-   *)
-
-
-
 
 let is_space = function
   | ' ' | '\012' | '\n' | '\r' | '\t' -> true
@@ -264,7 +177,7 @@ let rec fold_left
       if p left_sub then
         fold_left ~lf ~br ~p actual_right_ofs actual_right_len right
       else
-        br left_sub right
+        br left_sub (sub right actual_right_ofs actual_right_len)
     | Sub s -> 
       fold_left ~lf ~br ~p (s.start + ofs) (min len s.len) s.rp
     
@@ -285,7 +198,7 @@ let rec fold_right
       if p right_sub then
         fold_right ~lf ~br ~p actual_left_ofs actual_left_len left
       else
-        br left right_sub
+        br (sub left actual_left_ofs actual_left_len) right_sub
     | Sub s -> 
       fold_left ~lf ~br ~p (s.start + ofs) (min len s.len) s.rp
     
@@ -383,7 +296,7 @@ let rec rindex_from_helper
       and actual_left_len = max (min len (leftlen - ofs)) 0 in
       let actual_right_ofs = max (ofs - leftlen) 0
       and actual_right_len = len - actual_left_len in
-      let actual_left_fi = min fi actual_left_len
+      let actual_left_fi = min fi (actual_left_len - 1)
       and actual_right_fi = max (fi - actual_left_len) 0 in
       (
       try
