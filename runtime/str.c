@@ -655,7 +655,7 @@ static value caml_oldify_rope(value v, value *p, header_t hd){
   value result;
   mlsize_t sz, i;
   mlsize_t len, offset_index;
-  printf("hello, I am a rope:)\n");
+  // printf("hello, I am a rope:)\n");
   
   len = caml_rope_length(v);
   sz = Wsize_bsize(len) + 1; // size in words, +1 for padding

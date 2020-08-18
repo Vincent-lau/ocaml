@@ -234,6 +234,7 @@ void caml_oldify_one (value v, value *p)
       }else{
         CAMLassert (tag == Forward_tag);
         if (Wosize_hd(hd) > 1){
+          // We need to promote it using a user-defined promoting function
           typedef value (promote_fun)(value, value *, header_t);
           promote_fun *promoter;
           promoter = (promote_fun *) (Long_val(Field(v, 0)));
@@ -247,6 +248,7 @@ void caml_oldify_one (value v, value *p)
           *p = result;
         }
         else{
+          // just follow the usual process of forwarding it
           value f = Forward_val (v);
           tag_t ft = 0;
           int vv = 1;
