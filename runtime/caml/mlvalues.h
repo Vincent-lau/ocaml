@@ -212,6 +212,12 @@ typedef opcode_t * code_t;
 #define Forward_tag 250
 #define Forward_val(v) Field(v, 0)
 
+struct fwd_fun{
+  value (*minor_fwd)(value, value *, header_t);
+  value (*major_fwd)(value);
+};
+typedef struct fwd_fun * fwd_fun_t;
+
 /* If tag == Infix_tag : an infix header inside a closure */
 /* Infix_tag must be odd so that the infix header is scanned as an integer */
 /* Infix_tag must be 1 modulo 4 and infix headers can only occur in blocks

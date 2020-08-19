@@ -443,6 +443,13 @@ stdlib__lexing.cmx : \
     stdlib__array.cmx \
     stdlib__lexing.cmi
 stdlib__lexing.cmi :
+stdlib__linkTest.cmo : \
+    stdlib__obj.cmi \
+    stdlib__linkTest.cmi
+stdlib__linkTest.cmx : \
+    stdlib__obj.cmx \
+    stdlib__linkTest.cmi
+stdlib__linkTest.cmi :
 stdlib__list.cmo : \
     stdlib__sys.cmi \
     stdlib__seq.cmi \

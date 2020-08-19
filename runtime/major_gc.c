@@ -256,24 +256,43 @@ static inline value* mark_slice_darken(value *gray_vals_ptr,
     INSTR (++ *slice_pointers;)
     chd = Hd_val (child);
     if (Tag_hd (chd) == Forward_tag){
-      value f = Forward_val (child);
-      if ((in_ephemeron && Is_long(f)) ||
-          (Is_block (f)
-           && (!Is_in_value_area(f) || Tag_val (f) == Forward_tag
-               || Tag_val (f) == Lazy_tag
+      if(Wosize_hd(chd) > 1){
+        fwd_fun_t fs_ptr = (fwd_fun_t) (Long_val(Field(child, 0)));
+        value f = (*fs_ptr->major_fwd)(child);
+        Field(v, i) = f;
+
+         if (Is_block (f) && Is_young (f) && !Is_young (child)){
+            if(in_ephemeron) {
+              
+              add_to_ephe_ref_table (Caml_state->ephe_ref_table, v, i);
+              printf("added to ephe ref table\n");
+            } else {
+              add_to_ref_table (Caml_state->ref_table, &Field (v, i));
+              printf("added to ref table\n");
+            }
+          }
+       
+      }
+      else{
+        value f = Forward_val (child);
+        if ((in_ephemeron && Is_long(f)) ||
+            (Is_block (f)
+            && (!Is_in_value_area(f) || Tag_val (f) == Forward_tag
+                || Tag_val (f) == Lazy_tag
 #ifdef FLAT_FLOAT_ARRAY
-               || Tag_val (f) == Double_tag
+                || Tag_val (f) == Double_tag
 #endif
-               ))){
-        /* Do not short-circuit the pointer. */
-      }else{
-        /* The variable child is not changed because it must be mark alive */
-        Field (v, i) = f;
-        if (Is_block (f) && Is_young (f) && !Is_young (child)){
-          if(in_ephemeron) {
-            add_to_ephe_ref_table (Caml_state->ephe_ref_table, v, i);
-          } else {
-            add_to_ref_table (Caml_state->ref_table, &Field (v, i));
+                ))){
+          /* Do not short-circuit the pointer. */
+        }else{
+          /* The variable child is not changed because it must be mark alive */
+          Field (v, i) = f;
+          if (Is_block (f) && Is_young (f) && !Is_young (child)){
+            if(in_ephemeron) {
+              add_to_ephe_ref_table (Caml_state->ephe_ref_table, v, i);
+            } else {
+              add_to_ref_table (Caml_state->ref_table, &Field (v, i));
+            }
           }
         }
       }

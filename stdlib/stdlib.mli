@@ -1355,6 +1355,7 @@ module Int32        = Int32
 module Int64        = Int64
 module Lazy         = Lazy
 module Lexing       = Lexing
+module LinkTest     = LinkTest
 module List         = List
 module ListLabels   = ListLabels
 module Map          = Map
