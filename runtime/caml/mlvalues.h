@@ -212,8 +212,11 @@ typedef opcode_t * code_t;
 #define Forward_tag 250
 #define Forward_val(v) Field(v, 0)
 
+/* for minor_fwd(value v, value *p, value *pl)
+the last parameter is a pointer to the oldify_todo_list 
+which may or may not be used in the minor_fwd. */
 struct fwd_fun{
-  value (*minor_fwd)(value, value *, header_t);
+  value (*minor_fwd)(value, value *, value *);
   value (*major_fwd)(value);
 };
 typedef struct fwd_fun * fwd_fun_t;

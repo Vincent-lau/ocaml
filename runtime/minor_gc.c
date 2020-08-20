@@ -235,12 +235,11 @@ void caml_oldify_one (value v, value *p)
         CAMLassert (tag == Forward_tag);
         if (Wosize_hd(hd) > 1){
           // We need to promote it using a user-defined promoting function
-          
           fwd_fun_t fs_ptr = (fwd_fun_t) (Long_val(Field(v, 0)));
-          result = (*fs_ptr->minor_fwd)(v, p, hd);
+          result = (*fs_ptr->minor_fwd)(v, p, &oldify_todo_list);
           Hd_val(v) = 0;            /* Set forward flag */
           Field (v, 0) = result;     /*  and forward pointer. */
-          *p = result;
+          // *p = result;
         }
         else{
           // just follow the usual process of forwarding it

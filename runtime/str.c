@@ -534,7 +534,7 @@ CAMLprim value caml_rope_to_string_rec(value r, value b,
       actual_left_ofs = min(ofs, leftlen);
       actual_left_len = max(min(len, leftlen - ofs), 0);
       actual_right_ofs = max(ofs - leftlen, 0);
-      actual_right_len = len - actual_left_len;      
+      actual_right_len = len - actual_left_len;
 
       caml_rope_to_string_rec(left, b, actual_left_ofs, actual_left_len, idx);
       caml_rope_to_string_rec(right, b, actual_right_ofs, actual_right_len, 
@@ -561,19 +561,19 @@ CAMLprim value caml_rope_to_string(value r)
   CAMLlocal2(b, len);
   len = caml_ml_rope_length(r);
   b = caml_create_bytes(len);
-  caml_rope_to_string_rec(r, b, 0, len, 0);
+  caml_rope_to_string_rec(r, b, 0, Long_val(len), 0);
   CAMLreturn(b);
 }
 
 
-static value caml_get_rope_minor_fwd(void);
+static value caml_get_rope_fwd(void);
 // static value caml_oldify_rope(value v, value *p, header_t hd);
 
 CAMLprim value caml_rope_branch(value leftlen, value left, value right){
   CAMLparam3(leftlen, left, right);
   CAMLlocal1(b);
   b = caml_alloc_small(4, Forward_tag);
-  Field(b, 0) = caml_get_rope_minor_fwd();
+  Field(b, 0) = caml_get_rope_fwd();
   Field(b, 1) = leftlen;
   Field(b, 2) = left;
   Field(b, 3) = right;
@@ -586,7 +586,7 @@ CAMLprim value caml_rope_sub_cons(value rp, value start, value len){
   CAMLparam3(rp, start, len);
   CAMLlocal1(b);
   b = caml_alloc_small(4, Forward_tag);
-  Field(b, 0) = caml_get_rope_minor_fwd();
+  Field(b, 0) = caml_get_rope_fwd();
   Field(b, 1) = rp;
   Field(b, 2) = start;
   Field(b, 3) = len;
@@ -650,7 +650,7 @@ static void caml_oldify_rope_promotion(
   }
 }
 
-static value caml_oldify_rope(value v, value *p, header_t hd){
+static value caml_oldify_rope(value v, value *p, value *pl /*not used here */){
   // not sure if CAMLparam, CAMLreturn is needed
   // but since they are not used in other code in caml_oldify_one
   // it's probably not needed
@@ -658,7 +658,8 @@ static value caml_oldify_rope(value v, value *p, header_t hd){
   value result;
   mlsize_t sz, i;
   mlsize_t len, offset_index;
-  printf("hello, I am a rope:)\n");
+  header_t hd = Hd_val(v);
+  // printf("hello, I am a rope:)\n");
   
   len = caml_rope_length(v);
   sz = Wsize_bsize(len) + 1; // size in words, +1 for padding
@@ -671,54 +672,63 @@ static value caml_oldify_rope(value v, value *p, header_t hd){
   for(i = len; i < offset_index; ++i)
     Byte(result, i) = 0;
   Byte (result, offset_index) = offset_index - len;
+
+  *p = result;
   return result;
 }
 
 struct fwd_fun rp_fwd = {&caml_oldify_rope, NULL};
-static inline value caml_get_rope_minor_fwd(void){
+static inline value caml_get_rope_fwd(void){
   return Val_long(((long) &rp_fwd));
 }
 
 // forward and cons functions for linkTest below
 
+// static int count_link(value l){
+//   if(Is_long(l))
+//     return 0;
+//   else{
+//     return count_link(Field(l, 1)) + 1;
+//   }
+
+// }
+
 static value caml_link_major_fwd(value v){
   printf("hello, I am a testLink on major heap:)\n");
+  // printf("and I have %d layers\n", count_link(v));
+  value f = Field(v, 1);
 
-  printf("tag of value: %d\n", Tag_val(v));
-  // value f = Field(v, 1);
-  // if(!Is_long(f)){
-  //   printf("stats in caml_link_major_fwd tag: %d, size: %lu\n", Tag_val(f), Wosize_val(f));
-  //   printf("is f long: %d and is f's child long: %d\n", Is_long(f), Is_long(Field(f, 1)));
-  // }
-  // else{
-  //   printf("This is int: %ld\n", Long_val(f));
-  // }
-  return Field(v, 1);
+  CAMLassert(Tag_val(v) == Forward_tag);
+  return f;
 }
 
-static value caml_link_minor_fwd(value v, value *p, header_t hd){
+static value caml_link_minor_fwd(value v, value *p, value *pl){
     value result;
+    header_t hd = Hd_val(v);
     mlsize_t sz = Wosize_hd(hd);
-    if(hd == 0){
-      value f0 = Forward_val(v);
-      return caml_link_minor_fwd(f0, p, Hd_val(f0));
-    }
+    tag_t tag = Tag_val(v);
+
+    CAMLassert(Tag_hd(hd) == Forward_tag);
+    printf("hello, I am a linkTest on minor heap\n");
+
+    value field0;    
+    result = caml_alloc_shr_for_minor_gc (sz, tag, hd);
+    *p = result;
+    field0 = Field (v, 0);
+
+    // Hd_val (v) = 0;            /* Set forward flag */
+    // Field (v, 0) = result;     /*  and forward pointer. */
+
     CAMLassert(sz == 2);
-    printf("hello, I am a testLink on minor heap:)\n");
-    result = caml_alloc_shr_for_minor_gc (sz, Forward_tag, hd);
-    Field(result, 0) = Field(v, 0);
-    if(Hd_val(Field(v, 1)) == 0){
-      value f1 = Field(v, 1);
-      Field(result, 1) = caml_link_minor_fwd(f1, p, Hd_val(f1));
-    }
-    else{
-      Field(result, 1) = Field(v, 1);
-    }
+    Field (result, 0) = field0;
+    Field (result, 1) = *pl;    /* Add this block */
+    *pl = v;                    /*  to the "to do" list. */   
+
     return result;
 }
 
 struct fwd_fun lk_fwd = {&caml_link_minor_fwd, &caml_link_major_fwd};
-static inline value caml_get_link_major_fwd(void){
+static inline value caml_get_link_fwd(void){
   return Val_long(((long) &lk_fwd));
 }
 
@@ -726,7 +736,7 @@ CAMLprim value caml_link(value l){
   CAMLparam1(l);
   CAMLlocal1(b);
   b = caml_alloc_small(2, Forward_tag);
-  Field(b, 0) = caml_get_link_major_fwd();
+  Field(b, 0) = caml_get_link_fwd();
   Field(b, 1) = l;
   CAMLreturn(b);
 }
