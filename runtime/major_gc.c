@@ -258,8 +258,6 @@ static inline value* mark_slice_darken(value *gray_vals_ptr,
     if (Tag_hd (chd) == Forward_tag){
       if(Wosize_hd(chd) > 1){
         fwd_fun_t fs_ptr = (fwd_fun_t) (Long_val(Field(child, 0)));
-        // printf("color of child: %lu\n", Color_val(child));
-        // printf("color of parent: %lu\n", Color_val(v));
         value f = (*fs_ptr->major_fwd)(child);
         Field(v, i) = f;
 

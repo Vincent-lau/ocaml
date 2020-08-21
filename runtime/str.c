@@ -716,9 +716,6 @@ static value caml_link_minor_fwd(value v, value *p, value *pl){
     *p = result;
     field0 = Field (v, 0);
 
-    // Hd_val (v) = 0;            /* Set forward flag */
-    // Field (v, 0) = result;     /*  and forward pointer. */
-
     CAMLassert(sz == 2);
     Field (result, 0) = field0;
     Field (result, 1) = *pl;    /* Add this block */
