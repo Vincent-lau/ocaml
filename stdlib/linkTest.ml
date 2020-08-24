@@ -2,7 +2,7 @@ type t
 
 let leaf (n: int): t = Obj.obj (Obj.repr n)
 
-external link: t -> t = "caml_link"
+external link: t -> t = "caml_testlink_link"
 
 let next (l:t) = 
   let rt_l = Obj.repr l in
