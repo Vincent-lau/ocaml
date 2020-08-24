@@ -725,15 +725,71 @@ static value caml_link_minor_fwd(value v, value *p, value *pl){
 }
 
 struct fwd_fun lk_fwd = {&caml_link_minor_fwd, &caml_link_major_fwd};
-static inline value caml_get_link_fwd(void){
+static inline value caml_testLink_get_fwd(void){
   return Val_long(((long) &lk_fwd));
 }
 
-CAMLprim value caml_link(value l){
+CAMLprim value caml_testlink_link(value l){
   CAMLparam1(l);
   CAMLlocal1(b);
   b = caml_alloc_small(2, Forward_tag);
-  Field(b, 0) = caml_get_link_fwd();
+  Field(b, 0) = caml_testLink_get_fwd();
   Field(b, 1) = l;
   CAMLreturn(b);
 }
+
+/* cons and fwd functions for unify */
+
+
+static value caml_unify_minor_fwd(value v, value *p, value *pl){
+  value result;
+  header_t hd = Hd_val(v);
+  mlsize_t sz = Wosize_hd(hd);
+  tag_t tag = Tag_val(v);
+
+  CAMLassert(Tag_hd(hd) == Forward_tag);
+  printf("hello, I am a unify link typ on minor heap\n");
+
+  value field0;
+  result = caml_alloc_shr_for_minor_gc (sz, tag, hd);
+  *p = result;
+  field0 = Field (v, 0);
+
+  CAMLassert(sz == 2);
+  Field (result, 0) = field0;
+  Field (result, 1) = *pl;    /* Add this block */
+  *pl = v;                    /*  to the "to do" list. */   
+
+  return result;
+}
+
+static value caml_unify_major_fwd(value child){
+  value f1 = Field(child, 1);
+  if(Wosize_val(f1) == 1 && Is_block(Field(f1, 0))){
+    // f1 is a link node
+    printf("tag of f is: %d, \n", Tag_val(f1));
+    CAMLassert(Tag_val(f1) == 2);
+    printf("hello, I am a unify typ link on major heap:)\n");
+    return Field(f1, 0);
+  }
+  else
+    return child;
+
+}
+
+struct fwd_fun unify_fwd = {&caml_unify_minor_fwd, &caml_unify_major_fwd};
+
+
+CAMLprim value caml_unify_get_fwd(void){
+  return Val_long(((long) &unify_fwd));
+}
+
+CAMLprim value caml_unify_typ_cons(value contents){
+  CAMLparam1(contents);
+  CAMLlocal1(b);
+  b = caml_alloc_small(2, Forward_tag);
+  Field(b, 0) = caml_unify_get_fwd();
+  Field(b, 1) = contents;
+  CAMLreturn(b);
+}
+

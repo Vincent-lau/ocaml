@@ -623,5 +623,6 @@ module SubRope      = SubRope
 module SubRopeBuffer = SubRopeBuffer
 module Sys          = Sys
 module Uchar        = Uchar
+module Unify        = Unify
 module Unit         = Unit
 module Weak         = Weak

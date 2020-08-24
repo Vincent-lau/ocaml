@@ -258,8 +258,8 @@ static inline value* mark_slice_darken(value *gray_vals_ptr,
     if (Tag_hd (chd) == Forward_tag){
       if(Wosize_hd(chd) > 1){
         fwd_fun_t fs_ptr = (fwd_fun_t) (Long_val(Field(child, 0)));
-        value f = (*fs_ptr->major_fwd)(child);
-        Field(v, i) = f;
+        value new_child = (*fs_ptr->major_fwd)(child);
+        Field(v, i) = new_child;
 
       }
       else{

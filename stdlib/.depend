@@ -811,6 +811,20 @@ stdlib__uchar.cmx : \
     stdlib__char.cmx \
     stdlib__uchar.cmi
 stdlib__uchar.cmi :
+stdlib__unify.cmo : \
+    stdlib.cmi \
+    stdlib__obj.cmi \
+    stdlib__hashtbl.cmi \
+    stdlib__format.cmi \
+    stdlib__unify.cmi
+stdlib__unify.cmx : \
+    stdlib.cmx \
+    stdlib__obj.cmx \
+    stdlib__hashtbl.cmx \
+    stdlib__format.cmx \
+    stdlib__unify.cmi
+stdlib__unify.cmi : \
+    stdlib__format.cmi
 stdlib__unit.cmo : \
     stdlib__unit.cmi
 stdlib__unit.cmx : \
