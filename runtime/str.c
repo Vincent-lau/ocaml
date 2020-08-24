@@ -684,18 +684,9 @@ static inline value caml_get_rope_fwd(void){
 
 // forward and cons functions for linkTest below
 
-// static int count_link(value l){
-//   if(Is_long(l))
-//     return 0;
-//   else{
-//     return count_link(Field(l, 1)) + 1;
-//   }
-
-// }
 
 static value caml_link_major_fwd(value v){
   printf("hello, I am a testLink on major heap:)\n");
-  // printf("and I have %d layers\n", count_link(v));
   value f = Field(v, 1);
 
   CAMLassert(Tag_val(v) == Forward_tag);
@@ -767,7 +758,6 @@ static value caml_unify_major_fwd(value child){
   value f1 = Field(child, 1);
   if(Wosize_val(f1) == 1 && Is_block(Field(f1, 0))){
     // f1 is a link node
-    printf("tag of f is: %d, \n", Tag_val(f1));
     CAMLassert(Tag_val(f1) == 2);
     printf("hello, I am a unify typ link on major heap:)\n");
     return Field(f1, 0);

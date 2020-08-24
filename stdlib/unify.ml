@@ -19,20 +19,21 @@ let tref contents = typ_cons contents
 
 let pp_typ  : Format.formatter -> typ -> unit =
   fun fmt t ->
-  (* let module Teq : Hashtbl.HashedType with type t = typ =
+  let module Teq : Hashtbl.HashedType with type t = typ =
     struct
       type t = typ
       let equal = (==)
       let hash = Hashtbl.hash
-    end in *)
-  let tbl = Hashtbl.create 10 in
+    end in
+  let module H = Hashtbl.Make(Teq) in 
+  let tbl = H.create 10 in
   let counter = ref 0 in
   let rec pp_typ : Format.formatter -> typ -> unit =
     fun fmt t ->
-    match Hashtbl.find tbl t with
+    match H.find tbl t with
     | x -> Format.fprintf fmt "@[ref[%d]@ @[(%a)@]@]" x pp_typ' !t
     | exception Not_found ->
-       Hashtbl.add tbl t Stdlib.(!counter);
+       H.add tbl t Stdlib.(!counter);
        incr counter;
        pp_typ fmt t
   and pp_typ' : Format.formatter -> typ' -> unit =
