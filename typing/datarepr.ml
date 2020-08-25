@@ -120,8 +120,22 @@ let constructor_descrs ty_path decl cstrs =
             (Cstr_unboxed, [])
           | Cstr_tuple [] -> (Cstr_constant idx_const,
                    describe_constructors (idx_const+1) idx_nonconst rem)
-          | _  -> (Cstr_block idx_nonconst,
-                   describe_constructors idx_const (idx_nonconst+1) rem) in
+          | _  -> 
+            match cd_attributes with 
+              | hd :: tl when hd.attr_name.txt = "forward_tag" ->
+                print_string "this attributes list has "; print_int (List.length (hd::tl)); 
+                print_string " elements and the name of this constructor is: ";
+                print_string (Ident.name cd_id); print_newline ();
+                (Cstr_block Obj.forward_tag,
+                  describe_constructors idx_const (idx_nonconst) rem) 
+              | hd :: _ -> 
+                print_endline hd.attr_name.txt;
+                (Cstr_block idx_nonconst,
+                  describe_constructors idx_const (idx_nonconst+1) rem) 
+              | _ ->
+                (Cstr_block idx_nonconst,
+                  describe_constructors idx_const (idx_nonconst+1) rem) 
+        in
         let cstr_name = Ident.name cd_id in
         let existentials, cstr_args, cstr_inlined =
           let representation =
@@ -148,6 +162,11 @@ let constructor_descrs ty_path decl cstrs =
             cstr_attributes = cd_attributes;
             cstr_inlined;
           } in
+          (* (print_string "the tag of cstr is: ";
+          match cstr.cstr_tag with 
+          | Cstr_block i -> print_string "block tag: "; print_int i
+          | _ -> print_string "not a block"
+          ; print_newline ()); *)
         (cd_id, cstr) :: descr_rem in
   describe_constructors 0 0 cstrs
 
