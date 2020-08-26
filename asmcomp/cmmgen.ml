@@ -152,7 +152,7 @@ let rec expr_size env = function
      (* Pgenarray is excluded from recursive bindings by the
         check in Translcore.check_recursive_lambda *)
      RHS_nonrec
-  | Uprim (Pduprecord ((Record_regular | Record_inlined _), sz), _, _) ->
+  | Uprim (Pduprecord ((Record_regular _| Record_inlined _), sz), _, _) ->
       RHS_block sz
   | Uprim (Pduprecord (Record_unboxed _, _), _, _) ->
       assert false

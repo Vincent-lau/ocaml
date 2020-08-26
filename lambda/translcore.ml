@@ -341,7 +341,7 @@ and transl_exp0 e =
   | Texp_field(arg, _, lbl) ->
       let targ = transl_exp arg in
       begin match lbl.lbl_repres with
-          Record_regular | Record_inlined _ ->
+          Record_regular _ | Record_inlined _ ->
           Lprim (Pfield lbl.lbl_pos, [targ], e.exp_loc)
         | Record_unboxed _ -> targ
         | Record_float -> Lprim (Pfloatfield lbl.lbl_pos, [targ], e.exp_loc)
@@ -351,7 +351,7 @@ and transl_exp0 e =
   | Texp_setfield(arg, _, lbl, newval) ->
       let access =
         match lbl.lbl_repres with
-          Record_regular
+          Record_regular _
         | Record_inlined _ ->
           Psetfield(lbl.lbl_pos, maybe_pointer newval, Assignment)
         | Record_unboxed _ -> assert false
@@ -815,7 +815,7 @@ and transl_record loc env fields repres opt_init_expr =
                let field_kind = value_kind env typ in
                let access =
                  match repres with
-                   Record_regular | Record_inlined _ -> Pfield i
+                   Record_regular _ | Record_inlined _ -> Pfield i
                  | Record_unboxed _ -> assert false
                  | Record_extension _ -> Pfield (i + 1)
                  | Record_float -> Pfloatfield i in
@@ -835,17 +835,8 @@ and transl_record loc env fields repres opt_init_expr =
         if mut = Mutable then raise Not_constant;
         let cl = List.map extract_constant ll in
         match repres with
-        | Record_regular -> begin
-          try
-            let (_, tydecl) = Env.find_type_by_name (Longident.Lident "t") env in
-            match tydecl.type_attributes with
-            | hd :: _ when hd.attr_name.txt = "forward_tag" ->
-              Lconst(Const_block(Obj.forward_tag, cl))
-            | _ ->
-              Lconst(Const_block(0, cl))
-          with 
-            Not_found -> Lconst(Const_block(0, cl))
-          end
+        | Record_regular tag ->
+           Lconst(Const_block(tag, cl))
         | Record_inlined tag -> Lconst(Const_block(tag, cl))
         | Record_unboxed _ -> Lconst(match cl with [v] -> v | _ -> assert false)
         | Record_float ->
@@ -854,7 +845,7 @@ and transl_record loc env fields repres opt_init_expr =
             raise Not_constant
       with Not_constant ->
         match repres with
-          Record_regular ->
+          Record_regular _ ->
             Lprim(Pmakeblock(0, mut, Some shape), ll, loc)
         | Record_inlined tag ->
             Lprim(Pmakeblock(tag, mut, Some shape), ll, loc)
@@ -880,7 +871,7 @@ and transl_record loc env fields repres opt_init_expr =
       | Overridden (_lid, expr) ->
           let upd =
             match repres with
-              Record_regular
+              Record_regular _
             | Record_inlined _ ->
                 Psetfield(lbl.lbl_pos, maybe_pointer expr, Assignment)
             | Record_unboxed _ -> assert false

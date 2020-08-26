@@ -472,7 +472,11 @@ let transl_declaration env sdecl id =
             if unbox then Record_unboxed false
             else if List.for_all (fun l -> is_float env l.Types.ld_type) lbls'
             then Record_float
-            else Record_regular
+            else 
+              match sdecl.ptype_attributes with
+              | hd :: _ when hd.attr_name.txt = "forward_tag" ->
+                Record_regular (Obj.forward_tag)
+              | _ -> Record_regular 0
           in
           Ttype_record lbls, Type_record(lbls', rep)
       | Ptype_open -> Ttype_open, Type_open

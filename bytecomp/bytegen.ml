@@ -152,7 +152,7 @@ let rec size_of_lambda env = function
   | Llet (Strict, _k, id, Lprim (Pduprecord (kind, size), _, _), body)
     when check_recordwith_updates id body ->
       begin match kind with
-      | Record_regular | Record_inlined _ -> RHS_block size
+      | Record_regular _| Record_inlined _ -> RHS_block size
       | Record_unboxed _ -> assert false
       | Record_float -> RHS_floatblock size
       | Record_extension _ -> RHS_block (size + 1)
@@ -186,7 +186,7 @@ let rec size_of_lambda env = function
      (* Pgenarray is excluded from recursive bindings by the
         check in Translcore.check_recursive_lambda *)
       RHS_nonrec
-  | Lprim (Pduprecord ((Record_regular | Record_inlined _), size), _, _) ->
+  | Lprim (Pduprecord ((Record_regular _ | Record_inlined _), size), _, _) ->
       RHS_block size
   | Lprim (Pduprecord (Record_unboxed _, _), _, _) ->
       assert false
