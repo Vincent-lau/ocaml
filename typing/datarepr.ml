@@ -122,16 +122,13 @@ let constructor_descrs ty_path decl cstrs =
                    describe_constructors (idx_const+1) idx_nonconst rem)
           | _  -> 
             match cd_attributes with 
-              | hd :: tl when hd.attr_name.txt = "forward_tag" ->
-                print_string "this attributes list has "; print_int (List.length (hd::tl)); 
+              | hd :: _ when hd.attr_name.txt = "forward_tag" ->
+                (* print_string "this attributes list has "; print_int (List.length (hd::tl)); 
                 print_string " elements and the name of this constructor is: ";
-                print_string (Ident.name cd_id); print_newline ();
+                print_string (Ident.name cd_id); print_newline (); *)
                 (Cstr_block Obj.forward_tag,
-                  describe_constructors idx_const (idx_nonconst) rem) 
-              | hd :: _ -> 
-                print_endline hd.attr_name.txt;
-                (Cstr_block idx_nonconst,
-                  describe_constructors idx_const (idx_nonconst+1) rem) 
+                  describe_constructors idx_const (idx_nonconst + 1) rem) 
+                (* reserve the original for this constr although fwd tag is given to it *)
               | _ ->
                 (Cstr_block idx_nonconst,
                   describe_constructors idx_const (idx_nonconst+1) rem) 
@@ -141,7 +138,12 @@ let constructor_descrs ty_path decl cstrs =
           let representation =
             if decl.type_unboxed.unboxed
             then Record_unboxed true
-            else Record_inlined idx_nonconst
+            else 
+              match cd_attributes with 
+              | hd :: _ when hd.attr_name.txt = "forward_tag" ->
+                Record_inlined (Obj.forward_tag)
+              | _ ->
+                Record_inlined idx_nonconst
           in
           constructor_args decl.type_private cd_args cd_res
             (Path.Pdot (ty_path, cstr_name)) representation
@@ -162,11 +164,6 @@ let constructor_descrs ty_path decl cstrs =
             cstr_attributes = cd_attributes;
             cstr_inlined;
           } in
-          (* (print_string "the tag of cstr is: ";
-          match cstr.cstr_tag with 
-          | Cstr_block i -> print_string "block tag: "; print_int i
-          | _ -> print_string "not a block"
-          ; print_newline ()); *)
         (cd_id, cstr) :: descr_rem in
   describe_constructors 0 0 cstrs
 
@@ -238,6 +235,7 @@ let rec find_constr tag num_const num_nonconst = function
       else find_constr tag (num_const + 1) num_nonconst rem
   | c :: rem ->
       if tag = Cstr_block num_nonconst || tag = Cstr_unboxed
+        || tag = Cstr_block (Obj.forward_tag)
       then c
       else find_constr tag num_const (num_nonconst + 1) rem
 
