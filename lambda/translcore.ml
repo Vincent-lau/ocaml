@@ -835,7 +835,17 @@ and transl_record loc env fields repres opt_init_expr =
         if mut = Mutable then raise Not_constant;
         let cl = List.map extract_constant ll in
         match repres with
-        | Record_regular -> Lconst(Const_block(0, cl))
+        | Record_regular -> begin
+          try
+            let (_, tydecl) = Env.find_type_by_name (Longident.Lident "t") env in
+            match tydecl.type_attributes with
+            | hd :: _ when hd.attr_name.txt = "forward_tag" ->
+              Lconst(Const_block(Obj.forward_tag, cl))
+            | _ ->
+              Lconst(Const_block(0, cl))
+          with 
+            Not_found -> Lconst(Const_block(0, cl))
+          end
         | Record_inlined tag -> Lconst(Const_block(tag, cl))
         | Record_unboxed _ -> Lconst(match cl with [v] -> v | _ -> assert false)
         | Record_float ->
