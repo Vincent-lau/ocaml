@@ -810,8 +810,9 @@ let rec comp_expr env exp sz cont =
 
 (* Build indirection vectors *)
       let store = Storer.mk_store () in
+      let ab_size = max (Obj.forward_tag+1) sw.sw_numblocks in
       let act_consts = Array.make sw.sw_numconsts 0
-      and act_blocks = Array.make sw.sw_numblocks 0 in
+      and act_blocks = Array.make ab_size 0 in
       begin match sw.sw_failaction with (* default is index 0 *)
       | Some fail -> ignore (store.act_store () fail)
       | None      -> ()
