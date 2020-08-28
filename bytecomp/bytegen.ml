@@ -842,8 +842,8 @@ let rec comp_expr env exp sz cont =
       done ;
 
 (* Build label vectors *)
-      let lbl_blocks = Array.make sw.sw_numblocks 0 in
-      for i = sw.sw_numblocks - 1 downto 0 do
+      let lbl_blocks = Array.make ab_size 0 in
+      for i = ab_size - 1 downto 0 do
         lbl_blocks.(i) <- lbls.(act_blocks.(i))
       done;
       let lbl_consts = Array.make sw.sw_numconsts 0 in
