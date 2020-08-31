@@ -954,8 +954,9 @@ module ConstructorTagHashtbl = Hashtbl.Make(
 
 (* complement constructor tags *)
 let complete_tags nconsts nconstrs tags =
+  let seen_constr_sz = max (Obj.forward_tag+1) nconstrs in
   let seen_const = Array.make nconsts false
-  and seen_constr = Array.make nconstrs false in
+  and seen_constr = Array.make seen_constr_sz false in
   List.iter
     (function
       | Cstr_constant i -> seen_const.(i) <- true
@@ -971,6 +972,8 @@ let complete_tags nconsts nconstrs tags =
     if not seen_constr.(i) then
       ConstructorTagHashtbl.add r (Cstr_block i) ()
   done ;
+  if not seen_constr.((Obj.forward_tag)) then
+    ConstructorTagHashtbl.add r (Cstr_block (Obj.forward_tag)) ();
   r
 
 (* build a pattern from a constructor description *)
