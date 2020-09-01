@@ -954,13 +954,17 @@ module ConstructorTagHashtbl = Hashtbl.Make(
 
 (* complement constructor tags *)
 let complete_tags nconsts nconstrs tags =
-  let seen_constr_sz = max (Obj.forward_tag+1) nconstrs in
   let seen_const = Array.make nconsts false
-  and seen_constr = Array.make seen_constr_sz false in
+  and seen_constr = Array.make nconstrs false 
+  and seen_forward = ref false in
   List.iter
     (function
       | Cstr_constant i -> seen_const.(i) <- true
-      | Cstr_block i -> seen_constr.(i) <- true
+      | Cstr_block i -> 
+        if i = Obj.forward_tag then
+          seen_forward := true
+        else
+          seen_constr.(i) <- true
       | _  -> assert false)
     tags ;
   let r = ConstructorTagHashtbl.create (nconsts+nconstrs) in
@@ -972,7 +976,7 @@ let complete_tags nconsts nconstrs tags =
     if not seen_constr.(i) then
       ConstructorTagHashtbl.add r (Cstr_block i) ()
   done ;
-  if not seen_constr.((Obj.forward_tag)) then
+  if not !seen_forward then
     ConstructorTagHashtbl.add r (Cstr_block (Obj.forward_tag)) ();
   r
 
