@@ -122,10 +122,7 @@ let constructor_descrs ty_path decl cstrs =
                    describe_constructors (idx_const+1) idx_nonconst rem)
           | _  -> 
             match cd_attributes with 
-              | hd :: _ when hd.attr_name.txt = "forward_tag" ->
-                (* print_string "this attributes list has "; print_int (List.length (hd::tl)); 
-                print_string " elements and the name of this constructor is: ";
-                print_string (Ident.name cd_id); print_newline (); *)
+              | hd :: _ when hd.attr_name.txt = "forward" ->
                 (Cstr_block Obj.forward_tag,
                   describe_constructors idx_const (idx_nonconst + 1) rem) 
                 (* reserve the original for this constr although fwd tag is given to it *)
@@ -140,7 +137,7 @@ let constructor_descrs ty_path decl cstrs =
             then Record_unboxed true
             else 
               match cd_attributes with 
-              | hd :: _ when hd.attr_name.txt = "forward_tag" ->
+              | hd :: _ when hd.attr_name.txt = "forward" ->
                 Record_inlined (Obj.forward_tag)
               | _ ->
                 Record_inlined idx_nonconst

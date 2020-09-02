@@ -32,6 +32,7 @@
 #include "caml/roots.h"
 #include "caml/signals.h"
 #include "caml/weak.h"
+#include "caml/callback.h"
 
 #if defined (NATIVE_CODE) && defined (NO_NAKED_POINTERS)
 #define NATIVE_CODE_AND_NO_NAKED_POINTERS
@@ -257,9 +258,14 @@ static inline value* mark_slice_darken(value *gray_vals_ptr,
     chd = Hd_val (child);
     if (Tag_hd (chd) == Forward_tag){
       if(Wosize_hd(chd) > 1){
-        fwd_fun_t fs_ptr = (fwd_fun_t) (Long_val(Field(child, 0)));
-        value new_child = (*fs_ptr->major_fwd)(child);
+        printf("hi, I am a testLink on major heap\n");
+        value major_fwd = Field(child, 0);
+        value new_child = caml_callback(major_fwd, child);
         Field(v, i) = new_child;
+
+        // fwd_fun_t fs_ptr = (fwd_fun_t) (Long_val(Field(child, 0)));
+        // value new_child = (*fs_ptr->major_fwd)(child);
+        // Field(v, i) = new_child;
 
       }
       else{

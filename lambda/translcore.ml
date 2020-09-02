@@ -845,8 +845,8 @@ and transl_record loc env fields repres opt_init_expr =
             raise Not_constant
       with Not_constant ->
         match repres with
-          Record_regular _ ->
-            Lprim(Pmakeblock(0, mut, Some shape), ll, loc)
+          Record_regular tag ->
+            Lprim(Pmakeblock(tag, mut, Some shape), ll, loc)
         | Record_inlined tag ->
             Lprim(Pmakeblock(tag, mut, Some shape), ll, loc)
         | Record_unboxed _ -> (match ll with [v] -> v | _ -> assert false)

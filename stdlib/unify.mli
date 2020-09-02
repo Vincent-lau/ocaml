@@ -7,7 +7,6 @@ val (:=) : typ -> typ' -> unit
 val (!) : typ -> typ'
 val tref : typ' -> typ
 
-val build_link_typ : typ -> typ
 
 val pp_typ : Format.formatter -> typ -> unit 
 

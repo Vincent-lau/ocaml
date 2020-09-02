@@ -474,7 +474,7 @@ let transl_declaration env sdecl id =
             then Record_float
             else 
               match sdecl.ptype_attributes with
-              | hd :: _ when hd.attr_name.txt = "forward_tag" ->
+              | hd :: _ when hd.attr_name.txt = "forward" ->
                 Record_regular (Obj.forward_tag)
               | _ -> Record_regular 0
           in

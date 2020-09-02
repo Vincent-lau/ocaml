@@ -3,18 +3,20 @@ type typ' =
 | Fun of typ * typ
 | Var of tyvar
 | Link of typ 
-and typ [@@forward collapse_links]
+and typ = {collapse_links : typ -> typ; 
+  mutable contents : typ' }[@@forward collapse_links]
 
-external typ_cons : typ' -> typ = "caml_unify_typ_cons"
+(* external typ_cons : typ' -> typ = "caml_unify_typ_cons" *)
 
-let build_link_typ t = 
-  typ_cons (Link t)
+let collapse_links ({collapse_links = _; contents} as t: typ): typ =
+  match contents with
+  | Link t' -> t'
+  | _ -> t
 
-let (:=) (t:typ) (t':typ') = 
-  Obj.set_field (Obj.repr t) 1 (Obj.repr t')
 
-let (!) (t:typ) = (Obj.obj (Obj.field (Obj.repr t) 1) : typ')
-let tref contents = typ_cons contents
+let (:=) (t:typ) (t':typ') = t.contents <- t'
+let (!) {collapse_links = _; contents} = contents
+let tref contents = {collapse_links; contents}
 
 
 let pp_typ  : Format.formatter -> typ -> unit =
@@ -83,9 +85,9 @@ let var : unit -> typ =
 
 let (@->) x y : typ = tref (Fun (x, y))
 
-(* let example =
+let example =
   let a = var () and b = var () in
   let x = a @-> b
   and y = b @-> a in
   unify x y;
-  (x, y) *)
+  (x, y)
