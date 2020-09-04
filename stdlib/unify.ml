@@ -84,10 +84,10 @@ let var : unit -> typ =
   fun () -> incr counter; tref (Var Stdlib.(!counter))
 
 let (@->) x y : typ = tref (Fun (x, y))
-
+(* 
 let example =
   let a = var () and b = var () in
   let x = a @-> b
   and y = b @-> a in
   unify x y;
-  (x, y)
+  (x, y) *)

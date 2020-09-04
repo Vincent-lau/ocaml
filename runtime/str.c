@@ -716,18 +716,19 @@ static value caml_link_minor_fwd(value v, value *p, value *pl){
 }
 
 struct fwd_fun lk_fwd = {&caml_link_minor_fwd, &caml_link_major_fwd};
-static inline value caml_testLink_get_fwd(void){
+
+CAMLprim value caml_mylink_get_fwd(value v){
   return Val_long(((long) &lk_fwd));
 }
 
-CAMLprim value caml_testlink_link(value l){
-  CAMLparam1(l);
-  CAMLlocal1(b);
-  b = caml_alloc_small(2, Forward_tag);
-  Field(b, 0) = caml_testLink_get_fwd();
-  Field(b, 1) = l;
-  CAMLreturn(b);
-}
+// CAMLprim value caml_testlink_link(value l){
+//   CAMLparam1(l);
+//   CAMLlocal1(b);
+//   b = caml_alloc_small(2, Forward_tag);
+//   Field(b, 0) = caml_testLink_get_fwd();
+//   Field(b, 1) = l;
+//   CAMLreturn(b);
+// }
 
 /* cons and fwd functions for unify */
 

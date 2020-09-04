@@ -234,30 +234,11 @@ void caml_oldify_one (value v, value *p)
       }else{
         CAMLassert (tag == Forward_tag);
         if (Wosize_hd(hd) > 1){
-          value field0;
-          sz = Wosize_hd (hd);
-          result = caml_alloc_shr_for_minor_gc (sz, tag, hd);
-          *p = result;
-          field0 = Field (v, 0);
-          Hd_val (v) = 0;            /* Set forward flag */
+          fwd_fun_t fs_ptr = (fwd_fun_t) (Long_val(Field(v, 0)));
+          result = (*fs_ptr->minor_fwd)(v, p, &oldify_todo_list);
+          Hd_val(v) = 0;            /* Set forward flag */
           Field (v, 0) = result;     /*  and forward pointer. */
-          if (sz > 1){
-            Field (result, 0) = field0;
-            Field (result, 1) = oldify_todo_list;    /* Add this block */
-            oldify_todo_list = v;                    /*  to the "to do" list. */
-          }else{
-            CAMLassert (sz == 1);
-            p = &Field (result, 0);
-            v = field0;
-            goto tail_call;
-          }
-
-          
-          // fwd_fun_t fs_ptr = (fwd_fun_t) (Long_val(Field(v, 0)));
-          // result = (*fs_ptr->minor_fwd)(v, p, &oldify_todo_list);
-          // Hd_val(v) = 0;            /* Set forward flag */
-          // Field (v, 0) = result;     /*  and forward pointer. */
-          // // *p = result;
+          // *p = result;
         }
         else{
           // just follow the usual process of forwarding it

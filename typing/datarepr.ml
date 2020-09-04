@@ -124,8 +124,8 @@ let constructor_descrs ty_path decl cstrs =
             match cd_attributes with 
               | hd :: _ when hd.attr_name.txt = "forward" ->
                 (Cstr_block Obj.forward_tag,
-                  describe_constructors idx_const (idx_nonconst + 1) rem) 
-                (* reserve the original for this constr although fwd tag is given to it *)
+                  describe_constructors idx_const (idx_nonconst+1) rem) 
+                (* reserve this tag for this constr although fwd tag is given to it *)
               | _ ->
                 (Cstr_block idx_nonconst,
                   describe_constructors idx_const (idx_nonconst+1) rem) 
