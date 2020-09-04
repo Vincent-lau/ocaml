@@ -1340,8 +1340,13 @@ and close_one_function env id funct =
 (* Close a switch *)
 
 and close_switch env cases num_keys default =
+  let fwd_exists = 
+    List.exists (fun (key, _) -> key = Obj.forward_tag) cases in
+  let idx_size = 
+    if fwd_exists then (Obj.forward_tag+1)
+    else num_keys in
   let ncases = List.length cases in
-  let index = Array.make num_keys 0
+  let index = Array.make idx_size 0
   and store = Storer.mk_store () in
 
   (* First default case *)
