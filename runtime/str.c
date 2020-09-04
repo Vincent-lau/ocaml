@@ -770,17 +770,16 @@ static value caml_unify_major_fwd(value child){
 
 struct fwd_fun unify_fwd = {&caml_unify_minor_fwd, &caml_unify_major_fwd};
 
-
 CAMLprim value caml_unify_get_fwd(void){
   return Val_long(((long) &unify_fwd));
 }
 
-CAMLprim value caml_unify_typ_cons(value contents){
-  CAMLparam1(contents);
-  CAMLlocal1(b);
-  b = caml_alloc_small(2, Forward_tag);
-  Field(b, 0) = caml_unify_get_fwd();
-  Field(b, 1) = contents;
-  CAMLreturn(b);
-}
+// CAMLprim value caml_unify_typ_cons(value contents){
+//   CAMLparam1(contents);
+//   CAMLlocal1(b);
+//   b = caml_alloc_small(2, Forward_tag);
+//   Field(b, 0) = caml_unify_get_fwd();
+//   Field(b, 1) = contents;
+//   CAMLreturn(b);
+// }
 

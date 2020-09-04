@@ -1,21 +1,24 @@
 type tyvar = int
+type 'a fwd = int
 type typ' =
 | Fun of typ * typ
 | Var of tyvar
 | Link of typ 
-and typ = {collapse_links : typ -> typ; 
+and typ = {collapse_links: typ fwd; 
   mutable contents : typ' }[@@forward collapse_links]
 
-(* external typ_cons : typ' -> typ = "caml_unify_typ_cons" *)
+external get_unify_collpase_links: unit -> typ fwd = "caml_unify_get_fwd"
 
-let collapse_links ({collapse_links = _; contents} as t: typ): typ =
+let collapse_links = get_unify_collpase_links ()
+
+(* let collapse_links ({collapse_links = _; contents} as t: typ): typ =
   match contents with
   | Link t' -> t'
-  | _ -> t
+  | _ -> t *)
 
 
 let (:=) (t:typ) (t':typ') = t.contents <- t'
-let (!) {collapse_links = _; contents} = contents
+let (!) {contents} = contents
 let tref contents = {collapse_links; contents}
 
 
