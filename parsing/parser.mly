@@ -2920,9 +2920,27 @@ generic_constructor_declaration(opening):
   attrs = attributes
     {
       let args, res = args_res in
+      let new_args = match attrs with
+        | hd :: _ when hd.attr_name.txt = "forward" ->(
+          let fwd_ld = Type.field
+            (mkrhs "_fwd_fun" $sloc)
+            (mktyp ~loc:$sloc (Ptyp_constr ((mkrhs (Lident "int") $sloc), [])))
+            ~mut: Immutable
+            ~attrs: []
+            ~loc: (make_loc $sloc)
+            ~info: (symbol_info $endpos)
+          in
+          begin
+          match args with
+            | Pcstr_record lds -> 
+              Pcstr_record (fwd_ld :: lds)
+            | _ -> assert false
+          end)
+        | _ -> args
+      in 
       let info = symbol_info $endpos in
       let loc = make_loc $sloc in
-      cid, args, res, attrs, loc, info
+      cid, new_args, res, attrs, loc, info
     }
 ;
 %inline constructor_declaration(opening):
