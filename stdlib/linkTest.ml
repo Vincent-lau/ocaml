@@ -2,7 +2,7 @@ type 'a fwd = int
 
 type t = 
   | Lf of int
-  | Lk of {__fwd_fun: t fwd; mylink: t} [@forward "caml_mylink_get_fwd"];;
+  | Lk of {mylink: t} [@forward];;
 
 external get_mylink_fwd_fun: unit -> t fwd = "caml_mylink_get_fwd"
 
@@ -14,7 +14,7 @@ let my_link_fwd_fun = get_mylink_fwd_fun ()
     | Lk {link} -> link *)
 
 let cons_link l = 
-  Lk {__fwd_fun = my_link_fwd_fun; mylink = l}
+  Lk {_fwd_fun = my_link_fwd_fun; mylink = l}
 
 
 let rec build_link n =
