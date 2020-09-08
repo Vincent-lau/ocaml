@@ -2818,8 +2818,6 @@ generic_type_declaration(flag, kind):
               (Ptyp_constr ((mkrhs (Lident "fwd") $sloc), [tys])))
             ~mut: Immutable
             ~attrs: []
-            ~loc: (make_loc $sloc)
-            ~info: (symbol_info $endpos)
           in
           (match kind with
             | Ptype_record lds -> 
@@ -2856,8 +2854,6 @@ generic_type_declaration(flag, kind):
               (Ptyp_constr ((mkrhs (Lident "fwd") $sloc), [tys])))
             ~mut: Immutable
             ~attrs: []
-            ~loc: (make_loc $sloc)
-            ~info: (symbol_info $endpos)
           in
           (match kind with
             | Ptype_record lds -> 
@@ -2974,8 +2970,6 @@ generic_constructor_declaration(opening):
               (Ptyp_constr ((mkrhs (Lident "fwd") $sloc), tys)))
             ~mut: Immutable
             ~attrs: []
-            ~loc: (make_loc $sloc)
-            ~info: (symbol_info $endpos)
           in
           begin
           match args with
