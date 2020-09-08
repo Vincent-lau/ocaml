@@ -2924,7 +2924,7 @@ generic_constructor_declaration(opening):
         | hd :: _ when hd.attr_name.txt = "forward" ->(
           let fwd_ld = Type.field
             (mkrhs "_fwd_fun" $sloc)
-            (mktyp ~loc:$sloc (Ptyp_constr ((mkrhs (Lident "int") $sloc), [])))
+            (mktyp ~loc:$sloc (Ptyp_constr ((mkrhs (Lident "fwd") $sloc), [])))
             ~mut: Immutable
             ~attrs: []
             ~loc: (make_loc $sloc)
