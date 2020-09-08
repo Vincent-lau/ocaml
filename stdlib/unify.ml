@@ -1,11 +1,10 @@
 type tyvar = int
-type 'a fwd = int
+type _ fwd = int
 type typ' =
 | Fun of typ * typ
 | Var of tyvar
 | Link of typ 
-and typ = {collapse_links: typ fwd; 
-  mutable contents : typ' }[@@forward collapse_links]
+and typ = {mutable contents : typ'}[@@forward]
 
 external get_unify_collpase_links: unit -> typ fwd = "caml_unify_get_fwd"
 
@@ -19,7 +18,7 @@ let collapse_links = get_unify_collpase_links ()
 
 let (:=) (t:typ) (t':typ') = t.contents <- t'
 let (!) {contents} = contents
-let tref contents = {collapse_links; contents}
+let tref contents = {_fwd_fun = collapse_links; contents}
 
 
 let pp_typ  : Format.formatter -> typ -> unit =

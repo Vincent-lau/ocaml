@@ -1,8 +1,8 @@
-type 'a fwd = int
+type _ fwd = int
 
 type t = 
   | Lf of int
-  | Lk of { mylink: t}  [@forward "caml_mylink_get_fwd"] ;;
+  | Lk: { mylink: t} -> t  [@forward "caml_mylink_get_fwd"] 
 
 external get_mylink_fwd_fun: unit -> t fwd = "caml_mylink_get_fwd"
 
@@ -28,5 +28,3 @@ let print_link l =
       print_string "-> "; print_link_rec mylink
   in
   print_link_rec l; print_newline ()
-
-
