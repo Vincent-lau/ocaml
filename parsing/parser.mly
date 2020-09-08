@@ -2922,9 +2922,14 @@ generic_constructor_declaration(opening):
       let args, res = args_res in
       let new_args = match attrs with
         | hd :: _ when hd.attr_name.txt = "forward" ->(
+          let tys = match res with
+            | None -> []
+            | Some at_ty -> [at_ty] 
+          in
           let fwd_ld = Type.field
             (mkrhs "_fwd_fun" $sloc)
-            (mktyp ~loc:$sloc (Ptyp_constr ((mkrhs (Lident "fwd") $sloc), [])))
+            (mktyp ~loc:$sloc 
+              (Ptyp_constr ((mkrhs (Lident "fwd") $sloc), tys)))
             ~mut: Immutable
             ~attrs: []
             ~loc: (make_loc $sloc)
