@@ -2808,11 +2808,32 @@ generic_type_declaration(flag, kind):
   attrs2 = post_item_attributes
     {
       let (kind, priv, manifest) = kind_priv_manifest in
+      let new_kind = match attrs2 with
+        | hd :: _ when hd.attr_name.txt = "forward" ->(
+          let tys = (mktyp ~loc:$sloc 
+            (Ptyp_constr (mkrhs (Lident id.txt) $sloc, []))) in
+          let fwd_ld = Type.field
+            (mkrhs "_fwd_fun" $sloc)
+            (mktyp ~loc:$sloc 
+              (Ptyp_constr ((mkrhs (Lident "fwd") $sloc), [tys])))
+            ~mut: Immutable
+            ~attrs: []
+            ~loc: (make_loc $sloc)
+            ~info: (symbol_info $endpos)
+          in
+          (match kind with
+            | Ptype_record lds -> 
+              Ptype_record (fwd_ld :: lds)
+            | _ -> assert false
+          )
+        )
+        | _ -> kind
+      in
       let docs = symbol_docs $sloc in
       let attrs = attrs1 @ attrs2 in
       let loc = make_loc $sloc in
       (flag, ext),
-      Type.mk id ~params ~cstrs ~kind ~priv ?manifest ~attrs ~loc ~docs
+      Type.mk id ~params ~cstrs ~kind:new_kind ~priv ?manifest ~attrs ~loc ~docs
     }
 ;
 %inline generic_and_type_declaration(kind):
@@ -2825,11 +2846,32 @@ generic_type_declaration(flag, kind):
   attrs2 = post_item_attributes
     {
       let (kind, priv, manifest) = kind_priv_manifest in
+      let new_kind = match attrs2 with
+        | hd :: _ when hd.attr_name.txt = "forward" ->(
+          let tys = (mktyp ~loc:$sloc 
+            (Ptyp_constr (mkrhs (Lident id.txt) $sloc, []))) in
+          let fwd_ld = Type.field
+            (mkrhs "_fwd_fun" $sloc)
+            (mktyp ~loc:$sloc 
+              (Ptyp_constr ((mkrhs (Lident "fwd") $sloc), [tys])))
+            ~mut: Immutable
+            ~attrs: []
+            ~loc: (make_loc $sloc)
+            ~info: (symbol_info $endpos)
+          in
+          (match kind with
+            | Ptype_record lds -> 
+              Ptype_record (fwd_ld :: lds)
+            | _ -> assert false
+          )
+        )
+        | _ -> kind
+      in
       let docs = symbol_docs $sloc in
       let attrs = attrs1 @ attrs2 in
       let loc = make_loc $sloc in
       let text = symbol_text $symbolstartpos in
-      Type.mk id ~params ~cstrs ~kind ~priv ?manifest ~attrs ~loc ~docs ~text
+      Type.mk id ~params ~cstrs ~kind:new_kind ~priv ?manifest ~attrs ~loc ~docs ~text
     }
 ;
 %inline constraints:
