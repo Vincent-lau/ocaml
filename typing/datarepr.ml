@@ -126,6 +126,9 @@ let constructor_descrs ty_path decl cstrs =
                 (Cstr_block Obj.forward_tag,
                   describe_constructors idx_const (idx_nonconst+1) rem) 
                 (* reserve this tag for this constr although fwd tag is given to it *)
+              | hd :: _ when hd.attr_name.txt = "unboxed" ->
+                (Cstr_unboxed, 
+                  describe_constructors idx_const (idx_nonconst+1) rem) 
               | _ ->
                 (Cstr_block idx_nonconst,
                   describe_constructors idx_const (idx_nonconst+1) rem) 

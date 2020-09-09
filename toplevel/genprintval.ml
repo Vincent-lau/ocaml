@@ -384,7 +384,15 @@ module Make(O : OBJ)(EVP : EVALPATH with type valu = O.t) = struct
                       (try Ctype.apply env decl.type_params body ty_list with
                          Ctype.Cannot_apply -> abstract_type)
                 | {type_kind = Type_variant constr_list; type_unboxed} ->
-                    let unbx = type_unboxed.unboxed in
+                    let unbx_attr_exists = 
+                      List.exists 
+                        (fun c -> match c.cd_attributes with
+                          | hd :: _ when hd.attr_name.txt="unboxed" -> true
+                          | _ -> false)
+                      constr_list
+                    in
+                    let unbx_crope = unbx_attr_exists && (O.tag obj) = (Obj.string_tag) in
+                    let unbx = type_unboxed.unboxed || unbx_crope in
                     let tag =
                       if unbx then Cstr_unboxed
                       else if O.is_block obj
