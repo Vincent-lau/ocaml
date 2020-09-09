@@ -566,33 +566,6 @@ CAMLprim value caml_rope_to_string(value r)
 }
 
 
-static value caml_get_rope_fwd(void);
-// static value caml_oldify_rope(value v, value *p, header_t hd);
-
-CAMLprim value caml_rope_branch(value leftlen, value left, value right){
-  CAMLparam3(leftlen, left, right);
-  CAMLlocal1(b);
-  b = caml_alloc_small(4, Forward_tag);
-  Field(b, 0) = caml_get_rope_fwd();
-  Field(b, 1) = leftlen;
-  Field(b, 2) = left;
-  Field(b, 3) = right;
-  // fwd_fun_t fs_ptr = (fwd_fun_t) (Long_val(Field(b, 0)));
-  // printf("in rope_branch, test minor %d\n", fs_ptr->minor_fwd == &caml_oldify_rope);
-  CAMLreturn(b);
-}
-
-CAMLprim value caml_rope_sub_cons(value rp, value start, value len){
-  CAMLparam3(rp, start, len);
-  CAMLlocal1(b);
-  b = caml_alloc_small(4, Forward_tag);
-  Field(b, 0) = caml_get_rope_fwd();
-  Field(b, 1) = rp;
-  Field(b, 2) = start;
-  Field(b, 3) = len;
-  CAMLreturn(b);
-}
-
 // ofs is the start position a particular node
 // not the number of bytes that have been copied
 // which was used for the dst pointer but is not used anymore
@@ -678,8 +651,32 @@ static value caml_oldify_rope(value v, value *p, value *pl /*not used here */){
 }
 
 struct fwd_fun rp_fwd = {&caml_oldify_rope, NULL};
-static inline value caml_get_rope_fwd(void){
+static inline value caml_get_rope_fwd(value v){
   return Val_long(((long) &rp_fwd));
+}
+
+CAMLprim value caml_rope_branch(value leftlen, value left, value right){
+  CAMLparam3(leftlen, left, right);
+  CAMLlocal1(b);
+  b = caml_alloc_small(4, Forward_tag);
+  Field(b, 0) = caml_get_rope_fwd(Val_unit);
+  Field(b, 1) = leftlen;
+  Field(b, 2) = left;
+  Field(b, 3) = right;
+  // fwd_fun_t fs_ptr = (fwd_fun_t) (Long_val(Field(b, 0)));
+  // printf("in rope_branch, test minor %d\n", fs_ptr->minor_fwd == &caml_oldify_rope);
+  CAMLreturn(b);
+}
+
+CAMLprim value caml_rope_sub_cons(value rp, value start, value len){
+  CAMLparam3(rp, start, len);
+  CAMLlocal1(b);
+  b = caml_alloc_small(4, Forward_tag);
+  Field(b, 0) = caml_get_rope_fwd(Val_unit);
+  Field(b, 1) = rp;
+  Field(b, 2) = start;
+  Field(b, 3) = len;
+  CAMLreturn(b);
 }
 
 // forward and cons functions for linkTest below
@@ -770,16 +767,6 @@ static value caml_unify_major_fwd(value child){
 
 struct fwd_fun unify_fwd = {&caml_unify_minor_fwd, &caml_unify_major_fwd};
 
-CAMLprim value caml_unify_get_fwd(void){
+CAMLprim value caml_unify_get_fwd(value v){
   return Val_long(((long) &unify_fwd));
 }
-
-// CAMLprim value caml_unify_typ_cons(value contents){
-//   CAMLparam1(contents);
-//   CAMLlocal1(b);
-//   b = caml_alloc_small(2, Forward_tag);
-//   Field(b, 0) = caml_unify_get_fwd();
-//   Field(b, 1) = contents;
-//   CAMLreturn(b);
-// }
-
