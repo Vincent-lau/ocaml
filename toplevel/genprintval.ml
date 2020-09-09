@@ -394,7 +394,7 @@ module Make(O : OBJ)(EVP : EVALPATH with type valu = O.t) = struct
                     let unbx_crope = unbx_attr_exists && (O.tag obj) = (Obj.string_tag) in
                     let unbx = type_unboxed.unboxed || unbx_crope in
                     let tag =
-                      if unbx then Cstr_unboxed
+                      if unbx then Cstr_unboxed (O.tag obj)
                       else if O.is_block obj
                       then Cstr_block(O.tag obj)
                       else Cstr_constant(O.obj obj) in

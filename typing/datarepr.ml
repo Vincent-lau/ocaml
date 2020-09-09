@@ -117,7 +117,7 @@ let constructor_descrs ty_path decl cstrs =
           match cd_args with
           | _ when decl.type_unboxed.unboxed ->
             assert (rem = []);
-            (Cstr_unboxed, [])
+            (Cstr_unboxed 0, [])
           | Cstr_tuple [] -> (Cstr_constant idx_const,
                    describe_constructors (idx_const+1) idx_nonconst rem)
           | _  -> 
@@ -127,8 +127,9 @@ let constructor_descrs ty_path decl cstrs =
                   describe_constructors idx_const (idx_nonconst+1) rem) 
                 (* reserve this tag for this constr although fwd tag is given to it *)
               | hd :: _ when hd.attr_name.txt = "unboxed" ->
-                (Cstr_unboxed, 
+                (Cstr_unboxed (Obj.string_tag), 
                   describe_constructors idx_const (idx_nonconst+1) rem) 
+                (*this is supposed to whatever the type of cd_args*) 
               | _ ->
                 (Cstr_block idx_nonconst,
                   describe_constructors idx_const (idx_nonconst+1) rem) 
@@ -234,7 +235,8 @@ let rec find_constr tag num_const num_nonconst = function
       then c
       else find_constr tag (num_const + 1) num_nonconst rem
   | c :: rem ->
-      if tag = Cstr_block num_nonconst || tag = Cstr_unboxed
+      if tag = Cstr_block num_nonconst || tag = Cstr_unboxed 0
+        || tag = Cstr_unboxed (Obj.string_tag)
         || tag = Cstr_block (Obj.forward_tag)
       then c
       else find_constr tag num_const (num_nonconst + 1) rem

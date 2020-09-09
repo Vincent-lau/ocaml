@@ -1625,7 +1625,7 @@ let make_constr_matching p def ctx = function
           | Cstr_constant _
           | Cstr_block _ ->
               make_field_args p.pat_loc Alias arg 0 (cstr.cstr_arity - 1) argl
-          | Cstr_unboxed -> (arg, Alias) :: argl
+          | Cstr_unboxed _ -> (arg, Alias) :: argl
           | Cstr_extension _ ->
               make_field_args p.pat_loc Alias arg 1 cstr.cstr_arity argl
       in
@@ -2648,7 +2648,7 @@ let split_cases tag_lambda_list =
         match cstr with
         | Cstr_constant n -> ((n, act) :: consts, nonconsts)
         | Cstr_block n -> (consts, (n, act) :: nonconsts)
-        | Cstr_unboxed -> (consts, (0, act) :: nonconsts)
+        | Cstr_unboxed n -> (consts, (n, act) :: nonconsts)
         | Cstr_extension _ -> assert false
       )
   in

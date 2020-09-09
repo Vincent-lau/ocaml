@@ -305,7 +305,7 @@ and transl_exp0 e =
       end else begin match cstr.cstr_tag with
         Cstr_constant n ->
           Lconst(Const_pointer n)
-      | Cstr_unboxed ->
+      | Cstr_unboxed _ ->
           (match ll with [v] -> v | _ -> assert false)
       | Cstr_block n ->
           begin try

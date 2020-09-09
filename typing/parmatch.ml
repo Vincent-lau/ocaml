@@ -933,7 +933,7 @@ let should_extend ext env = match ext with
   | [] -> assert false
   | (p,_)::_ ->
       begin match Pattern_head.desc p with
-      | Construct {cstr_tag=(Cstr_constant _|Cstr_block _|Cstr_unboxed)} ->
+      | Construct {cstr_tag=(Cstr_constant _|Cstr_block _|Cstr_unboxed _)} ->
           let path =
             get_constructor_type_path (Pattern_head.typ p) (Pattern_head.env p)
           in
@@ -956,7 +956,8 @@ module ConstructorTagHashtbl = Hashtbl.Make(
 let complete_tags nconsts nconstrs tags =
   let seen_const = Array.make nconsts false
   and seen_constr = Array.make nconstrs false 
-  and seen_forward = ref false in
+  and seen_forward = ref false
+  and seen_str = ref false in
   List.iter
     (function
       | Cstr_constant i -> seen_const.(i) <- true
@@ -965,6 +966,9 @@ let complete_tags nconsts nconstrs tags =
           seen_forward := true
         else
           seen_constr.(i) <- true
+      | Cstr_unboxed i ->
+        if i = Obj.string_tag then
+          seen_str := true
       | _  -> assert false)
     tags ;
   let r = ConstructorTagHashtbl.create (nconsts+nconstrs) in
@@ -978,6 +982,8 @@ let complete_tags nconsts nconstrs tags =
   done ;
   if not !seen_forward then
     ConstructorTagHashtbl.add r (Cstr_block (Obj.forward_tag)) ();
+  if not !seen_str then
+    ConstructorTagHashtbl.add r (Cstr_unboxed (Obj.string_tag)) ();
   r
 
 (* build a pattern from a constructor description *)
@@ -2168,7 +2174,7 @@ let extendable_path path =
     Path.same path Predef.path_option)
 
 let rec collect_paths_from_pat r p = match p.pat_desc with
-| Tpat_construct(_, {cstr_tag=(Cstr_constant _|Cstr_block _|Cstr_unboxed)},ps)
+| Tpat_construct(_, {cstr_tag=(Cstr_constant _|Cstr_block _|Cstr_unboxed _)},ps)
   ->
     let path = get_constructor_type_path p.pat_type p.pat_env in
     List.fold_left
