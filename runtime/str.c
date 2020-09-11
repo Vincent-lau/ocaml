@@ -651,7 +651,7 @@ static value caml_oldify_rope(value v, value *p, value *pl /*not used here */){
 }
 
 struct fwd_fun rp_fwd = {&caml_oldify_rope, NULL};
-static inline value caml_get_rope_fwd(value v){
+CAMLprim value caml_get_rope_fwd(value v){
   return Val_long(((long) &rp_fwd));
 }
 

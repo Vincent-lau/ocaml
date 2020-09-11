@@ -341,6 +341,21 @@ stdlib__format.cmx : \
 stdlib__format.cmi : \
     stdlib.cmi \
     stdlib__buffer.cmi
+stdlib__forwardedRope.cmo : \
+    stdlib__string.cmi \
+    stdlib.cmi \
+    stdlib__list.cmi \
+    stdlib__char.cmi \
+    stdlib__bytes.cmi \
+    stdlib__forwardedRope.cmi
+stdlib__forwardedRope.cmx : \
+    stdlib__string.cmx \
+    stdlib.cmx \
+    stdlib__list.cmx \
+    stdlib__char.cmx \
+    stdlib__bytes.cmx \
+    stdlib__forwardedRope.cmi
+stdlib__forwardedRope.cmi :
 stdlib__fun.cmo : \
     stdlib__printexc.cmi \
     stdlib__fun.cmi
@@ -444,10 +459,8 @@ stdlib__lexing.cmx : \
     stdlib__lexing.cmi
 stdlib__lexing.cmi :
 stdlib__linkTest.cmo : \
-    stdlib__obj.cmi \
     stdlib__linkTest.cmi
 stdlib__linkTest.cmx : \
-    stdlib__obj.cmx \
     stdlib__linkTest.cmi
 stdlib__linkTest.cmi :
 stdlib__list.cmo : \
@@ -813,13 +826,11 @@ stdlib__uchar.cmx : \
 stdlib__uchar.cmi :
 stdlib__unify.cmo : \
     stdlib.cmi \
-    stdlib__obj.cmi \
     stdlib__hashtbl.cmi \
     stdlib__format.cmi \
     stdlib__unify.cmi
 stdlib__unify.cmx : \
     stdlib.cmx \
-    stdlib__obj.cmx \
     stdlib__hashtbl.cmx \
     stdlib__format.cmx \
     stdlib__unify.cmi

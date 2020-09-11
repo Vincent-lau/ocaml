@@ -93,3 +93,4 @@ STDLIB_MODULES=\
   $(P)compactSubRopeBuffer \
   $(P)unify \
   $(P)linkTest \
+  $(P)forwardedRope 
