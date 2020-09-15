@@ -810,13 +810,13 @@ let rec comp_expr env exp sz cont =
 
 (* Build indirection vectors *)
       let store = Storer.mk_store () in
-      let forward_exists = 
-        List.exists (fun (n, _) -> n = Obj.forward_tag) sw.sw_blocks in
-      let str_exists = 
+      let fwd_exists = 
+        List.exists (fun (n, _) -> n = Obj.forward_tag) sw.sw_blocks
+      and str_exists = 
         List.exists (fun (n, _) -> n = Obj.string_tag) sw.sw_blocks in
       let ab_size = 
         (if str_exists then (Obj.string_tag+1)
-        else if forward_exists then (Obj.forward_tag+1)
+        else if fwd_exists then (Obj.forward_tag+1)
         else sw.sw_numblocks) in 
       let act_consts = Array.make sw.sw_numconsts 0
       and act_blocks = Array.make ab_size 0 in

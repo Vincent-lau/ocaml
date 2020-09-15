@@ -1341,10 +1341,13 @@ and close_one_function env id funct =
 
 and close_switch env cases num_keys default =
   let fwd_exists = 
-    List.exists (fun (key, _) -> key = Obj.forward_tag) cases in
+    List.exists (fun (key, _) -> key = Obj.forward_tag) cases
+  and str_exists = 
+    List.exists (fun (key, _) -> key = Obj.string_tag) cases in
   let idx_size = 
-    if fwd_exists then max (Obj.forward_tag+1) num_keys
-    else num_keys in
+    (if str_exists then max (Obj.string_tag+1) num_keys
+    else if fwd_exists then max (Obj.forward_tag+1) num_keys
+    else num_keys) in
   let ncases = List.length cases in
   let index = Array.make idx_size 0
   and store = Storer.mk_store () in
