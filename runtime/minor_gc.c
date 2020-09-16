@@ -180,7 +180,7 @@ void caml_set_minor_heap_size (asize_t bsz)
   reset_table ((struct generic_table *) Caml_state->custom_table);
 }
 
-static FILE *fp;
+static FILE *fp = NULL;
 static inline void dump_pointers(value v){
   if(fp){
     if(Tag_val(v) <= No_scan_tag || Tag_val(v) == String_tag){
@@ -384,7 +384,10 @@ void caml_empty_minor_heap (void)
     Caml_state->in_minor_collection = 1;
     caml_gc_message (0x02, "<");
     caml_oldify_local_roots();
-    fp = fopen(getenv("OCAMLHEAPDUMP"), "w");
+    const char *dumpfile = getenv("OCAMLHEAPDUMP");
+    if (dumpfile){
+      fp = fopen(dumpfile, "a");
+    }
     CAML_INSTR_TIME (tmr, "minor/local_roots");
     for (r = Caml_state->ref_table->base;
          r < Caml_state->ref_table->ptr; r++) {
@@ -392,7 +395,8 @@ void caml_empty_minor_heap (void)
     }
     CAML_INSTR_TIME (tmr, "minor/ref_table");
     caml_oldify_mopup ();
-    fclose(fp);
+    if(fp)
+      fclose(fp);
     CAML_INSTR_TIME (tmr, "minor/copy");
     /* Update the ephemerons */
     for (re = Caml_state->ephe_ref_table->base;
