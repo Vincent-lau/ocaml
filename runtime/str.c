@@ -576,6 +576,12 @@ static void caml_oldify_rope_promotion(
   mlsize_t len)
 {
   CAMLassert(Is_young(v) && Is_block(v));
+  static int first = 1;
+  if(!first)
+    heap_dump_pointers(v);
+  if(first)
+    first = 0;
+  
   if (Tag_val(v) == String_tag){
     char *s = Bp_val(v);
     strncpy(dst, s + ofs, len);
@@ -612,11 +618,6 @@ static void caml_oldify_rope_promotion(
     // it might be that the children of a rope have been already forwarded
     // i.e. header is 0
     // the printing statement are just to check this
-
-    // printf("caml_oldify_rope: tag : %d, is_young : %d, is_block : %d, header : %lu\n", 
-    // Tag_val(v), Is_young(v), Is_block(v), Hd_val(v));
-    // printf("and the forward pointer is pointing to a tag: %d, whose content is %s\n",
-    // Tag_val(Field(v,0)), Bp_val(Field(v, 0)) );
 
     CAMLassert(Hd_val(v) == 0);
     caml_oldify_rope_promotion(Field(v, 0), dst, ofs, len);

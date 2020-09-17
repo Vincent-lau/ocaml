@@ -612,6 +612,9 @@ CAMLextern void caml_remove_generational_global_root (value *);
 
 CAMLextern void caml_modify_generational_global_root(value *r, value newval);
 
+extern FILE *dump_file;
+void heap_dump_pointers(value v);
+
 #ifdef __cplusplus
 }
 #endif
