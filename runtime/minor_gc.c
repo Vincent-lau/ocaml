@@ -183,19 +183,14 @@ void caml_set_minor_heap_size (asize_t bsz)
 
 FILE *dump_file = NULL;
 void heap_dump_pointers(value v){
-  const char *dfname = getenv("OCAMLHEAPDUMP");
-  if (dfname){
-    dump_file = fopen(dfname, "a");
-    if(dump_file){
-      if(Tag_val(v) <= No_scan_tag || Tag_val(v) == String_tag){
-        fprintf(dump_file, "%p,%hhu,", (value *) v, Tag_val(v));
-        for(int i = 0; i < Wosize_val(v); ++i){        
-            fprintf(dump_file, "%p,", (value *) Field(v, i));
-        }
-        fprintf(dump_file, "%ld\n", Caml_state->stat_minor_collections);
+  if(dump_file){
+    if(Tag_val(v) <= No_scan_tag || Tag_val(v) == String_tag){
+      fprintf(dump_file, "%p,%hhu,", (value *) v, Tag_val(v));
+      for(int i = 0; i < Wosize_val(v); ++i){        
+          fprintf(dump_file, "%p,", (value *) Field(v, i));
       }
+      fprintf(dump_file, "%ld\n", Caml_state->stat_minor_collections);
     }
-    fclose(dump_file);
   }
 }
 
@@ -386,6 +381,10 @@ void caml_empty_minor_heap (void)
     prev_alloc_words = caml_allocated_words;
     Caml_state->in_minor_collection = 1;
     caml_gc_message (0x02, "<");
+    const char *dfname = getenv("OCAMLHEAPDUMP");
+    if(dfname){
+      dump_file = fopen(dfname, "a");
+    }
     caml_oldify_local_roots();
     CAML_INSTR_TIME (tmr, "minor/local_roots");
     for (r = Caml_state->ref_table->base;
@@ -395,6 +394,8 @@ void caml_empty_minor_heap (void)
     CAML_INSTR_TIME (tmr, "minor/ref_table");
     caml_oldify_mopup ();
     CAML_INSTR_TIME (tmr, "minor/copy");
+    if(dump_file)
+      fclose(dump_file);
     /* Update the ephemerons */
     for (re = Caml_state->ephe_ref_table->base;
          re < Caml_state->ephe_ref_table->ptr; re++){
