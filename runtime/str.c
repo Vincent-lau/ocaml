@@ -579,7 +579,7 @@ static void caml_oldify_rope_promotion(
   static int first = 1;
   if(!first)
     heap_dump_pointers(v);
-  if(first)
+  else
     first = 0;
   
   if (Tag_val(v) == String_tag){
